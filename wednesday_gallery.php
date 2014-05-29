@@ -19,7 +19,7 @@
 		wp_enqueue_script('gallery-script', plugins_url() . '/wednesday-gallery/wednesday-gallery.js', array(), '1.0.0', true);
 	}
 
-	private function wednesday_gallery_getAttachmentURL($id, $image_size) {
+	function wednesday_gallery_getAttachmentURL($id, $image_size) {
 
 		$image_array = wp_get_attachment_image_src($id, $image_size);
 
