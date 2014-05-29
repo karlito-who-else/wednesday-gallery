@@ -19,6 +19,17 @@
 		wp_enqueue_script('gallery-script', plugins_url() . '/wednesday-gallery/wednesday-gallery.js', array(), '1.0.0', true);
 	}
 
+	private function wednesday_gallery_getAttachmentURL($id, $image_size) {
+
+		$image_array = wp_get_attachment_image_src($id, $image_size);
+
+		if ($image_array) {
+			return $image_array[0];
+		}
+
+		return '';
+	}
+
 	function wednesday_gallery_shortcode($atts) {
 
 		/* based upon a concept by ShibaShake (http://shibashake.com/wordpress-theme/how-to-render-your-own-wordpress-photo-gallery) */
@@ -45,9 +56,10 @@
 			'layout' => '',
 			'template' => '',
 			'toggletext' => 'thumbnails',
-			'withlinks' => 'false',
-			'withcaptions' => 'true',
-			'withshare' => 'true'
+			'usedivs' => false,
+			'withlinks' => false,
+			'withcaptions' => true,
+			'withshare' => true
 		), $atts));
 
 		// set the ID and classes
@@ -131,8 +143,8 @@
 			}
 
 			// apply links if "withlinks" has been specified
-			$before_image = $withlinks == 'true' ? $before_image . '<a href="' . wp_get_attachment_url($image->ID) . '">' : $before_image;
-			$after_image = $withlinks == 'true' ? $after_image . '</a>' : $after_image;
+			$before_image = $withlinks ? $before_image . '<a href="' . wp_get_attachment_url($image->ID) . '">' : $before_image;
+			$after_image = $withlinks ? $after_image . '</a>' : $after_image;
 
 			$caption = $image->post_excerpt;
 
@@ -142,18 +154,26 @@
 			$image_alt = get_post_meta($image->ID,'_wp_attachment_image_alt', true);
 
 			// render your gallery here
-			echo "\t\t$before_image",
-				// str_replace(
-				// 	'img ',
-				// 	'img data-fullsize="' . wp_get_attachment_url($image->ID) . '" ',
-					preg_replace(
-						'/(width|height)=\"\d*\"\s/',
-						"",
-						wp_get_attachment_image($image->ID, $size)
-					)
-				// )
-				,
-				"$after_image\n";
+			if ($usedivs) {
+				echo "\t\t$before_image",
+					"<div style=\"background-image: url('",
+					wednesday_gallery_getAttachmentURL($image->ID, $size),
+					"');\"></div>",
+					"$after_image\n";
+			} else {
+				echo "\t\t$before_image",
+					// str_replace(
+					// 	'img ',
+					// 	'img data-fullsize="' . wp_get_attachment_url($image->ID) . '" ',
+						preg_replace(
+							'/(width|height)=\"\d*\"\s/',
+							"",
+							wp_get_attachment_image($image->ID, $size)
+						)
+					// )
+					,
+					"$after_image\n";
+			}
 
 			$templatecount++;
 		}
@@ -181,11 +201,19 @@
 
 					$image_alt = get_post_meta($image->ID,'_wp_attachment_image_alt', true);
 
-					// render your gallery here
-					echo "\t\t$before_image";
-					echo preg_replace( '/(width|height)=\"\d*\"\s/', "", wp_get_attachment_image($image->ID, 'thumbnail'));
-					// echo "$imagecount<br/>"; // debugging
-					echo "$after_image\n";
+					if ($usedivs) {
+						echo "\t\t$before_image",
+							"<div style=\"background-image: url('",
+							wednesday_gallery_getAttachmentURL($image->ID, $size),
+							"');\"></div>",
+							"$after_image\n";
+					} else {
+						// render your gallery here
+						echo "\t\t$before_image",
+							preg_replace( '/(width|height)=\"\d*\"\s/', "", wp_get_attachment_image($image->ID, 'thumbnail')),
+							// echo "$imagecount<br/>"; // debugging
+							"$after_image\n";
+					}
 				}
 				echo "\t</ul>\n";
 				break;
