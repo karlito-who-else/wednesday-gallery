@@ -61,18 +61,14 @@
 	}
 
 	Wednesday.Gallery.carouselReposition = function() {
-		console.log('carouselResize');
 		//grab the width of the image
 		Wednesday.Gallery.item_width = $('.carousel .gallery-images li').outerWidth(true);
-		console.log('Wednesday.Gallery.item_width = ', Wednesday.Gallery.item_width);
 		//and calculate left value
 		Wednesday.Gallery.left_value = (Wednesday.Gallery.item_width / 2) * (-1);
 		//set the default item to the correct position
 		$('.carousel .gallery-images').css({'left' : Wednesday.Gallery.left_value});
-
 		// fix the slide text widths
 		$('.carousel .gallery-images li .slide-content').width($('.carousel .gallery-images li .slide-content img').width());
-
 	}
 
 	Wednesday.Gallery.carouselBindButtons = function() {
