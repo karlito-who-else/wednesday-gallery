@@ -229,6 +229,31 @@
 
 	}
 
+
+	function wednesday_attachment_field_link($form_fields, $post) {
+
+		$form_fields['wednesday-link-url'] = array(
+			'label' => 'Link URL',
+			'input' => 'text',
+			'value' => get_post_meta( $post->ID, 'wednesday_link_url', true ),
+			'helps' => 'Add Link URL'
+		);
+
+		return $form_fields;
+
+	}
+
+	function wednesday_attachment_field_link_save( $post, $attachment ) {
+	    if( isset( $attachment['wednesday-link-url'] ) )
+			update_post_meta( $post['ID'], 'wednesday_link_url', esc_url( $attachment['wednesday-link-url'] ) );
+		return $post;
+	}
+
+	// add link fields to media
+	add_filter( 'attachment_fields_to_edit', 'wednesday_attachment_field_link', 10, 2 );
+	add_filter( 'attachment_fields_to_save', 'wednesday_attachment_field_link_save', 10, 2 );
+
+
 	remove_shortcode('gallery');
 	add_shortcode('gallery', 'wednesday_gallery_shortcode');
 
