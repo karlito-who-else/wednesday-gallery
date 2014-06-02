@@ -30,6 +30,17 @@
 		return '';
 	}
 
+	function wednesday_gallery_template($template, $data) {
+
+		foreach($data as $key => $value) {
+			$template = str_replace('%' . strtoupper($key) . '%', $value, $template);
+
+		}
+
+		return $template;
+
+	}
+
 	function wednesday_gallery_shortcode($atts) {
 
 		/* based upon a concept by ShibaShake (http://shibashake.com/wordpress-theme/how-to-render-your-own-wordpress-photo-gallery) */
@@ -50,25 +61,25 @@
 			'icontag' => 'dt',
 			'captiontag' => 'dd',
 			'columns' => 3,
-			'size' => 'medium',
+			'layout' => '',
 			'link' => 'file',
 			'name' => 'gallery',
-			'layout' => '',
+			'size' => 'medium',
+			'sizes' => '',
 			'template' => '',
+			'thumbtemplate' => '',
 			'toggletext' => 'thumbnails',
 			'usedivs' => false,
 			'withlinks' => false,
-			'withcaptions' => true,
-			'withshare' => true
 		), $atts));
 
 		// set the ID and classes
 		$gallery_id = $name != 'gallery' ? "id=\"$name\"" : '';
 
 		// load the template sizes
-		$sizes = array();
-		if (!empty($template)) {
-			$sizes = explode(',', $template);
+		$sizelist = array();
+		if (!empty($sizes)) {
+			$sizelist = explode(',', $sizes);
 		}
 
 		switch($layout) {
@@ -89,11 +100,7 @@
 				break;
 		}
 
-		// get the images
-
-		$imagecount = 0;
-		$templatecount = 0;
-
+		// set the default arguments
 		$args = array(
 			'post_type' => 'attachment',
 			'post_status' => 'inherit',
@@ -108,77 +115,138 @@
 			$args['numberposts'] = -1;
 		}
 
+		// start the counters
+		$imagecount = 0;
+		$sizecount = 0;
+		$output_thumbs = '';
+
+		// get the images
 		$images = get_posts($args);
 
-		foreach ( $images as $image ) {
+		foreach ($images as $image) {
 			$imagecount++;
 
 			// use the template size if available, otherwise the specified size
-			if (count($sizes) > 0) {
-				if ($templatecount < count($sizes)) {
-					$size = $sizes[$templatecount];
+			if (count($sizelist) > 0) {
+				if ($sizecount < count($sizelist)) {
+					$size = $sizelist[$sizecount];
 				} else {
-					$templatecount = 0;
-					$size = $size[$templatecount];
+					$sizecount = 0;
+					$size = $sizelist[$sizecount];
 				}
 			}
 
-			$caption = $withcaptions ? '<span class="caption">' . $image->post_title . '</span>' : '';
-			$share = $withshare ? '<span class="share">share</span>' : '';
+			$sizecount++;
 
-			switch($layout) {
-				case 'carousel':
-				case 'carousel-with-thumbs':
-					$before_image = '<li data-image="' . $imagecount .'"><div class="slide-content">';
-					$after_image = $caption . $share . '</div></li>';
-					break;
-				case 'tiles':
-					$before_image = '<div data-image="' . $imagecount . '" class="tile ' . $size . '">';
-					$after_image = $caption . $share . '</div>';
-					break;
-				default:
-					$before_image = '';
-					$after_image = $caption . $share . '';
-					break;
+			$data = array(
+				'IMAGE_COUNT' => $imagecount,
+				'IMAGE_ID' => $image->ID,
+				'IMAGE' => wp_get_attachment_image($image->ID, $size),
+				'IMAGE_URL' => wednesday_gallery_getAttachmentURL($image->ID, $size),
+				'TITLE' => $image->post_title,
+				'EXCERPT' => $image->post_excerpt,
+				'DESCRIPTION' => empty($image->post_content)) ? $image->post_title : $image->post_content;
+				'ALT_TEXT' => get_post_meta($image->ID,'_wp_attachment_image_alt', true),
+				'LINK_URL' => wp_get_attachment_url($image->ID),
+				'DATE_DAY' => get_the_time('j', $image->ID),
+				'DATE_MONTH' => get_the_time('F', $image->ID),
+				'DATE_YEAR' => get_the_time('Y', $image->ID),
+			);
+
+			$template_out = $template; // reset the template
+
+			if ($template_out == '') { // if the template is empty, use the default template for the layout
+
+				switch($layout) {
+					case 'carousel-with-thumbs':
+						$template_thumbs .= '<li data-thumbnail="%IMAGE_COUNT%">';
+						$template_thumbs .= $usedivs ? '	<div style="background-image: url(''%IMAGE_URL%'');"></div>' : '	%IMAGE%';
+						$template_thumbs .= '</li>';
+					case 'carousel':
+						$template_out .= '<li data-image="%IMAGE_COUNT%">';
+						$template_out .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
+						$template_out .= '		<div class="slide-content">';
+						$template_out .= $usedivs ? '			<div style="background-image: url(''%IMAGE_URL%'');"></div>' : '			%IMAGE%';
+						$template_out .= '		</div>';
+						$template_out .= '		<div class="slide-info">';
+						$template_out .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
+						$template_out .= '			<span class="title">%TITLE%</span>';
+						$template_out .= '		</div>';
+						$template_out .= $withlinks ? ' </a>' : '';
+						$template_out .= '</li>';
+						break;
+					case 'tiles':
+						$template_out .= '<div data-image="%IMAGE_COUNT%" class="tile ' . $size . '">';
+						$template_out .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
+						$template_out .= $usedivs ? '			<div style="background-image: url(''%IMAGE_URL%'');"></div>' : '			%IMAGE%';
+						$template_out .= '		<div class="slide-info">';
+						$template_out .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
+						$template_out .= '			<span class="title">%TITLE%</span>';
+						$template_out .= '		</div>';
+						$template_out .= $withlinks ? ' </a>' : '';
+						$template_out .= '</div>';
+						break;
+					default:
+						$template_out .= $withlinks ? '<a href="%LINK_URL%">' : '';
+						$template_out .= $usedivs ? '	<div style="background-image: url(''%IMAGE_URL%'');"></div>' : '	%IMAGE%';
+						$template_out .= $withlinks ? '</a>' : '';
+						break;
+				}
 			}
 
-			// apply links if "withlinks" has been specified
-			$before_image = $withlinks ? $before_image . '<a href="' . wp_get_attachment_url($image->ID) . '">' : $before_image;
-			$after_image = $withlinks ? $after_image . '</a>' : $after_image;
 
-			$caption = $image->post_excerpt;
+			// $caption = $withcaptions ? : '';
+			// $share = $withshare ? '<span class="share">share</span>' : '';
 
-			$description = $image->post_content;
-			if($description == '') $description = $image->post_title;
+			// switch($layout) {
+			// 	case 'carousel':
+			// 	case 'carousel-with-thumbs':
+			// 		$before_image = '<li data-image="' . $imagecount .'"><div class="slide-content">';
+			// 		$after_image = $caption . $share . '</div></li>';
+			// 		break;
+			// 	case 'tiles':
+			// 		$before_image = '<div data-image="' . $imagecount . '" class="tile ' . $size . '">';
+			// 		$after_image = $caption . $share . '</div>';
+			// 		break;
+			// 	default:
+			// 		$before_image = '';
+			// 		$after_image = $caption . $share . '';
+			// 		break;
+			// }
 
-			$image_alt = get_post_meta($image->ID,'_wp_attachment_image_alt', true);
+			// $before_image = $withlinks ? $before_image . '<a href="' . wp_get_attachment_url($image->ID) . '">' : $before_image;
+			// $after_image = $withlinks ? $after_image . '</a>' : $after_image;
 
-			// render your gallery here
-			if ($usedivs) {
-				echo "\t\t$before_image",
-					"<div style=\"background-image: url('",
-					wednesday_gallery_getAttachmentURL($image->ID, $size),
-					"');\"></div>",
-					"$after_image\n";
-			} else {
-				echo "\t\t$before_image",
-					// str_replace(
-					// 	'img ',
-					// 	'img data-fullsize="' . wp_get_attachment_url($image->ID) . '" ',
-						preg_replace(
-							'/(width|height)=\"\d*\"\s/',
-							"",
-							wp_get_attachment_image($image->ID, $size)
-						)
-					// )
-					,
-					"$after_image\n";
-			}
+			// $caption = $image->post_excerpt;
 
-			$templatecount++;
+			// $description = $image->post_content;
+			// if($description == '') $description = $image->post_title;
+
+			// $image_alt = get_post_meta($image->ID,'_wp_attachment_image_alt', true);
+
+			// // render your gallery here
+			// if ($usedivs) {
+			// 	echo "\t\t$before_image",
+			// 		"<div style=\"background-image: url('",
+			// 		wednesday_gallery_getAttachmentURL($image->ID, $size),
+			// 		"');\"></div>",
+			// 		"$after_image\n";
+			// } else {
+			// 	echo "\t\t$before_image",
+			// 			preg_replace(
+			// 				'/(width|height)=\"\d*\"\s/',
+			// 				"",
+			// 				wp_get_attachment_image($image->ID, $size)
+			// 			),
+			// 		"$after_image\n";
+			// }
+
+			echo $this->wednesday_gallery_template($template_out, $data);
+			$output_thumbs .= $this->wednesday_gallery_template($template_thumbs, $data); // save the thumbnail output for later
+
 		}
 
-		// add extra markup for other layouts
+		// add closing markup for layout (carousel, tiles, etc.)
 		switch($layout) {
 			case 'carousel':
 				echo "\t</ul>\n";
@@ -187,34 +255,37 @@
 				echo "\t</ul>\n";
 				echo "\t<a href=\"#\" class=\"gallery-thumbnails-toggle\">$toggletext</a>\n";
 				echo "\t<ul class=\"gallery-thumbnails\">\n";
-				$imagecount = 0;
-				foreach ( $images as $image ) {
-					$imagecount++;
 
-					$before_image = '<li data-thumbnail="' . $imagecount .'">';
-					$after_image = '</li>';
+				echo $output_thumbs;
 
-					$caption = $image->post_excerpt;
+				// $imagecount = 0;
+				// foreach ( $images as $image ) {
+				// 	$imagecount++;
 
-					$description = $image->post_content;
-					if($description == '') $description = $image->post_title;
+				// 	$before_image = '<li data-thumbnail="' . $imagecount .'">';
+				// 	$after_image = '</li>';
 
-					$image_alt = get_post_meta($image->ID,'_wp_attachment_image_alt', true);
+				// 	$caption = $image->post_excerpt;
 
-					if ($usedivs) {
-						echo "\t\t$before_image",
-							"<div style=\"background-image: url('",
-							wednesday_gallery_getAttachmentURL($image->ID, $size),
-							"');\"></div>",
-							"$after_image\n";
-					} else {
-						// render your gallery here
-						echo "\t\t$before_image",
-							preg_replace( '/(width|height)=\"\d*\"\s/', "", wp_get_attachment_image($image->ID, 'thumbnail')),
-							// echo "$imagecount<br/>"; // debugging
-							"$after_image\n";
-					}
-				}
+				// 	$description = $image->post_content;
+				// 	if($description == '') $description = $image->post_title;
+
+				// 	$image_alt = get_post_meta($image->ID,'_wp_attachment_image_alt', true);
+
+				// 	if ($usedivs) {
+				// 		echo "\t\t$before_image",
+				// 			"<div style=\"background-image: url('",
+				// 			wednesday_gallery_getAttachmentURL($image->ID, $size),
+				// 			"');\"></div>",
+				// 			"$after_image\n";
+				// 	} else {
+				// 		// render your gallery here
+				// 		echo "\t\t$before_image",
+				// 			preg_replace( '/(width|height)=\"\d*\"\s/', "", wp_get_attachment_image($image->ID, 'thumbnail')),
+				// 			// echo "$imagecount<br/>"; // debugging
+				// 			"$after_image\n";
+				// 	}
+				// }
 				echo "\t</ul>\n";
 				break;
 			case 'tiles':
