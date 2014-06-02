@@ -84,6 +84,11 @@
 		}
 
 		switch($layout) {
+			case 'json':
+				echo '<script ' . $gallery_id . ' type="text/json">';
+				echo '{';
+				echo '	"slides" : [';
+				break;
 			case 'carousel':
 			case 'carousel-with-thumbs':
 				echo "\n<div $gallery_id class=\"gallery carousel\">\n";
@@ -144,6 +149,8 @@
 				'IMAGE_ID' => $image->ID,
 				'IMAGE' => wp_get_attachment_image($image->ID, $size),
 				'IMAGE_URL' => wednesday_gallery_getAttachmentURL($image->ID, $size),
+				'THUMB' => wp_get_attachment_image($image->ID, 'thumbnail'),
+				'THUMB_URL' => wednesday_gallery_getAttachmentURL($image->ID, 'thumbnail'),
 				'TITLE' => $image->post_title,
 				'EXCERPT' => $image->post_excerpt,
 				'DESCRIPTION' => empty($image->post_content) ? $image->post_title : $image->post_content,
@@ -159,6 +166,14 @@
 
 			if ($template_slides == '') { // if the template is empty, use the default template for the layout
 				switch($layout) {
+					case 'json':
+						$template_slides .= '{';
+						$template_slides .= '"count": "%IMAGE_COUNT%",';
+						$template_slides .= '"id": "%IMAGE_ID%",';
+						$template_slides .= '"image_url": "%IMAGE_URL%",';
+						$template_slides .= '"title": "%TITLE%"';
+						$template_slides .= $imagecount < count($images) ? '},' : '}';
+						break;
 					case 'carousel':
 					case 'carousel-with-thumbs':
 						$template_slides .= '<li data-image="%IMAGE_COUNT%">';
@@ -194,9 +209,16 @@
 
 			if ($template_thumbs == '') { // if the template is empty, use the default template for the layout
 				switch($layout) {
+					case 'json':
+						$template_thumbs .= '{';
+						$template_thumbs .= '"count": "%IMAGE_COUNT%",';
+						$template_thumbs .= '"id": "%IMAGE_ID%",';
+						$template_thumbs .= '"image_url": "%THUMB_URL%"';
+						$template_thumbs .= $imagecount < count($images) ? '},' : '}';
+						break;
 					case 'carousel-with-thumbs':
 						$template_thumbs .= '<li data-thumbnail="%IMAGE_COUNT%">';
-						$template_thumbs .= $usedivs ? "	<div style=\"background-image: url('%IMAGE_URL%');\"></div>" : '	%IMAGE%';
+						$template_thumbs .= $usedivs ? "	<div style=\"background-image: url('%THUMB_URL%');\"></div>" : '	%THUMB%';
 						$template_thumbs .= '</li>';
 						break;
 					default:
@@ -257,6 +279,14 @@
 
 		// add closing markup for layout (carousel, tiles, etc.)
 		switch($layout) {
+			case 'json':
+				echo '	],';
+				echo '	"thumbnails": [';
+				echo $output_thumbs;
+				echo '	]';
+				echo '}';
+				echo '</script>';
+				break;
 			case 'carousel':
 				echo "\t</ul>\n";
 				break;
