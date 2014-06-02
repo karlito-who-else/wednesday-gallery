@@ -32,9 +32,10 @@
 
 	function wednesday_gallery_template($template, $data) {
 
-		foreach($data as $key => $value) {
-			$template = str_replace('%' . strtoupper($key) . '%', $value, $template);
-
+		if (!empty($template)) {
+			foreach($data as $key => $value) {
+				$template = str_replace('%' . strtoupper($key) . '%', $value, $template);
+			}
 		}
 
 		return $template;
@@ -145,56 +146,64 @@
 				'IMAGE_URL' => wednesday_gallery_getAttachmentURL($image->ID, $size),
 				'TITLE' => $image->post_title,
 				'EXCERPT' => $image->post_excerpt,
-				'DESCRIPTION' => empty($image->post_content)) ? $image->post_title : $image->post_content;
-				'ALT_TEXT' => get_post_meta($image->ID,'_wp_attachment_image_alt', true),
+				'DESCRIPTION' => empty($image->post_content) ? $image->post_title : $image->post_content,
+				'ALT_TEXT' => get_post_meta($image->ID, '_wp_attachment_image_alt', true),
 				'LINK_URL' => wp_get_attachment_url($image->ID),
 				'DATE_DAY' => get_the_time('j', $image->ID),
 				'DATE_MONTH' => get_the_time('F', $image->ID),
-				'DATE_YEAR' => get_the_time('Y', $image->ID),
+				'DATE_YEAR' => get_the_time('Y', $image->ID)
 			);
 
-			$template_out = $template; // reset the template
+			$template_slides = $template; // reset the template
+			$template_thumbs = $thumbtemplate;
 
-			if ($template_out == '') { // if the template is empty, use the default template for the layout
-
+			if ($template_slides == '') { // if the template is empty, use the default template for the layout
 				switch($layout) {
-					case 'carousel-with-thumbs':
-						$template_thumbs .= '<li data-thumbnail="%IMAGE_COUNT%">';
-						$template_thumbs .= $usedivs ? '	<div style="background-image: url(''%IMAGE_URL%'');"></div>' : '	%IMAGE%';
-						$template_thumbs .= '</li>';
 					case 'carousel':
-						$template_out .= '<li data-image="%IMAGE_COUNT%">';
-						$template_out .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
-						$template_out .= '		<div class="slide-content">';
-						$template_out .= $usedivs ? '			<div style="background-image: url(''%IMAGE_URL%'');"></div>' : '			%IMAGE%';
-						$template_out .= '		</div>';
-						$template_out .= '		<div class="slide-info">';
-						$template_out .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
-						$template_out .= '			<span class="title">%TITLE%</span>';
-						$template_out .= '		</div>';
-						$template_out .= $withlinks ? ' </a>' : '';
-						$template_out .= '</li>';
+					case 'carousel-with-thumbs':
+						$template_slides .= '<li data-image="%IMAGE_COUNT%">';
+						$template_slides .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
+						$template_slides .= '		<div class="slide-content">';
+						$template_slides .= $usedivs ? "			<div style=\"background-image: url('%IMAGE_URL%');\"></div>" : '			%IMAGE%';
+						$template_slides .= '		</div>';
+						$template_slides .= '		<div class="slide-info">';
+						$template_slides .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
+						$template_slides .= '			<span class="title">%TITLE%</span>';
+						$template_slides .= '		</div>';
+						$template_slides .= $withlinks ? ' </a>' : '';
+						$template_slides .= '</li>';
 						break;
 					case 'tiles':
-						$template_out .= '<div data-image="%IMAGE_COUNT%" class="tile ' . $size . '">';
-						$template_out .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
-						$template_out .= $usedivs ? '			<div style="background-image: url(''%IMAGE_URL%'');"></div>' : '			%IMAGE%';
-						$template_out .= '		<div class="slide-info">';
-						$template_out .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
-						$template_out .= '			<span class="title">%TITLE%</span>';
-						$template_out .= '		</div>';
-						$template_out .= $withlinks ? ' </a>' : '';
-						$template_out .= '</div>';
+						$template_slides .= '<div data-image="%IMAGE_COUNT%" class="tile ' . $size . '">';
+						$template_slides .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
+						$template_slides .= $usedivs ? "			<div style=\"background-image: url('%IMAGE_URL%');\"></div>" : '			%IMAGE%';
+						$template_slides .= '		<div class="slide-info">';
+						$template_slides .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
+						$template_slides .= '			<span class="title">%TITLE%</span>';
+						$template_slides .= '		</div>';
+						$template_slides .= $withlinks ? ' </a>' : '';
+						$template_slides .= '</div>';
 						break;
 					default:
-						$template_out .= $withlinks ? '<a href="%LINK_URL%">' : '';
-						$template_out .= $usedivs ? '	<div style="background-image: url(''%IMAGE_URL%'');"></div>' : '	%IMAGE%';
-						$template_out .= $withlinks ? '</a>' : '';
+						$template_slides .= $withlinks ? '<a href="%LINK_URL%">' : '';
+						$template_slides .= $usedivs ? "	<div style=\"background-image: url('%IMAGE_URL%');\"></div>" : '	%IMAGE%';
+						$template_slides .= $withlinks ? '</a>' : '';
 						break;
 				}
 			}
 
-
+			if ($template_thumbs == '') { // if the template is empty, use the default template for the layout
+				switch($layout) {
+					case 'carousel-with-thumbs':
+						$template_thumbs .= '<li data-thumbnail="%IMAGE_COUNT%">';
+						$template_thumbs .= $usedivs ? "	<div style=\"background-image: url('%IMAGE_URL%');\"></div>" : '	%IMAGE%';
+						$template_thumbs .= '</li>';
+						break;
+					default:
+						$template_thumbs .= '';
+						break;
+				}
+			}
 			// $caption = $withcaptions ? : '';
 			// $share = $withshare ? '<span class="share">share</span>' : '';
 
@@ -241,8 +250,8 @@
 			// 		"$after_image\n";
 			// }
 
-			echo $this->wednesday_gallery_template($template_out, $data);
-			$output_thumbs .= $this->wednesday_gallery_template($template_thumbs, $data); // save the thumbnail output for later
+			echo wednesday_gallery_template($template_slides, $data);
+			$output_thumbs .= wednesday_gallery_template($template_thumbs, $data); // save the thumbnail output for later
 
 		}
 
