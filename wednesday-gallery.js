@@ -140,78 +140,6 @@
 
 	}
 
-	// Wednesday.Gallery.carouselSetup = function() {
-
-	// 	//rotation speed and timer
-	// 	var speed = 5000;
-	// 	// var run = setInterval('rotate()', speed);
-
-	// 	// Wednesday.Gallery.carouselResize();
-
-
-	// 	// add the currentSlide to the first slide (which is second in position due to the previous command)
-	// 	$('.carousel .gallery-images li:nth-child(2)').addClass('currentSlide');
-	// 	$('.carousel .gallery-thumbnails li:first').addClass('currentSlide');
-
-	// 	//if user clicked on prev button
-	// 	$('a.prev').click(function(e) {
-
-	// 		//get the right position
-	// 		var left_indent = parseInt($('.carousel .gallery-images').css('left')) + Wednesday.Gallery.item_width;
-
-	// 		//slide the item
-	// 		$('.carousel .gallery-images').animate({'left' : left_indent}, 200, function(){
-
-	// 			//move the last item and put it as first item
-	// 			$('.carousel .gallery-images li:first').before($('.carousel .gallery-images li:last'));
-
-	// 			Wednesday.Gallery.carouselUpdateCurrentSlide();
-
-	// 			//set the default item to correct position
-	// 			$('.carousel .gallery-images').css({'left' : Wednesday.Gallery.left_value});
-
-	// 		});
-
-	// 		//cancel the link behavior
-	// 		e.preventDefault();
-
-	// 	});
-
-	// 	//if user clicked on next button
-	// 	$('a.next').click(function(e) {
-
-	// 		//get the right position
-	// 		var left_indent = parseInt($('.carousel .gallery-images').css('left')) - Wednesday.Gallery.item_width;
-
-	// 		//slide the item
-	// 		$('.carousel .gallery-images').animate({'left' : left_indent}, 200, function () {
-
-	// 			//move the first item and put it as last item
-	// 			$('.carousel .gallery-images li:last').after($('.carousel .gallery-images li:first'));
-
-	// 			Wednesday.Gallery.carouselUpdateCurrentSlide();
-
-	// 			//set the default item to correct position
-	// 			$('.carousel .gallery-images').css({'left' : Wednesday.Gallery.left_value});
-
-	// 		});
-
-	// 		//cancel the link behavior
-	// 		e.preventDefault();
-
-	// 	});
-
-	// 	//if mouse hover, pause the auto rotation, otherwise rotate it
-	// 	$('.carousel .gallery-images').hover(
-	// 		function() {
-	// 			// clearInterval(run);
-	// 		},
-	// 		function() {
-	// 			// run = setInterval('Wednesday.Gallery.carouselRotate()', speed);
-	// 		}
-	// 	);
-	// }
-
 	//a simple function to click next link
 	//a timer will call this function, and the rotation will begin :)
 	Wednesday.Gallery.carouselRotate = function() {
@@ -225,9 +153,13 @@
 // Bind Events
 
 $(document).ready(function() {
-	$('.carousel').imagesLoaded(Wednesday.Gallery.carouselSetup);
+	if ($('.carousel').length) {
+		$('.carousel').imagesLoaded(Wednesday.Gallery.carouselSetup);
+	};
 });
 
 $(window).resize(function() {
-	Wednesday.Gallery.carouselReposition();
+	if ($('.carousel').length) {
+		Wednesday.Gallery.carouselReposition();
+	}
 });
