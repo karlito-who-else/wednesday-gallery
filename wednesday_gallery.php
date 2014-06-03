@@ -243,6 +243,7 @@
 				break;
 			case 'carousel':
 				echo "\t</ul>\n";
+				echo "</div>\n";
 				break;
 			case 'carousel-with-thumbs':
 				echo "\t</ul>\n";
@@ -250,13 +251,14 @@
 				echo "\t<ul class=\"gallery-thumbnails\">\n";
 				echo $output_thumbs;
 				echo "\t</ul>\n";
+				echo "</div>\n";
 				break;
 			case 'tiles':
+				echo "</div>\n";
+				break;
 			default:
 				break;
 		}
-
-		echo "</div>\n";
 
 	}
 
