@@ -8,15 +8,13 @@
 	Author URI: http://www.wednesdayagency.com/
 	*/
 
-	function wednesday_gallery_jquery_enqueue() {
-	   wp_deregister_script('jquery');
-	   wp_register_script('jquery', "http" . ($_SERVER['SERVER_PORT'] == 443 ? "s" : "") . "://code.jquery.com/jquery-2.1.1.min.js", false, null);
-	   wp_enqueue_script('jquery');
-	}
-
-	function wednesday_gallery_scripts() {
-		// wp_enqueue_style( 'style-name', get_stylesheet_uri() );
-		wp_enqueue_script('gallery-script', plugins_url() . '/wednesday-gallery/wednesday-gallery.js', array(), '1.0.0', true);
+	function wednesday_gallery_enqueue_scripts() {
+		if (!is_admin()) {
+			wp_deregister_script('jquery');
+			wp_register_script('jquery', "http" . ($_SERVER['SERVER_PORT'] == 443 ? "s" : "") . "://code.jquery.com/jquery-2.1.1.min.js", false, null);
+			wp_enqueue_script('jquery');
+			wp_enqueue_script('gallery-script', plugins_url() . '/wednesday-gallery/wednesday-gallery.js', array(), '1.0.0', true);
+		}
 	}
 
 	function wednesday_gallery_getAttachmentURL($id, $image_size) {
@@ -85,7 +83,7 @@
 
 		switch($layout) {
 			case 'json':
-				echo '<script ' . $gallery_id . ' type="text/json">';
+				echo '<script ' . $gallery_id . ' type="application/json">';
 				echo '{';
 				echo '	"slides" : [';
 				break;
@@ -334,9 +332,6 @@
 
 		echo "</div>\n";
 
-		if (!is_admin()) add_action("wp_enqueue_scripts", "wednesday_gallery_jquery_enqueue", 11);
-		add_action('wp_enqueue_scripts', 'wednesday_gallery_scripts');
-
 	}
 
 
@@ -363,6 +358,7 @@
 	add_filter( 'attachment_fields_to_edit', 'wednesday_attachment_field_link', 10, 2 );
 	add_filter( 'attachment_fields_to_save', 'wednesday_attachment_field_link_save', 10, 2 );
 
+	add_action('wp_enqueue_scripts', 'wednesday_gallery_enqueue_scripts');
 
 	remove_shortcode('gallery');
 	add_shortcode('gallery', 'wednesday_gallery_shortcode');
