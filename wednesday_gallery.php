@@ -59,6 +59,7 @@
 			'itemtag' => 'dl',
 			'icontag' => 'dt',
 			'captiontag' => 'dd',
+			'class' => '',
 			'columns' => 3,
 			'layout' => '',
 			'link' => 'file',
@@ -89,7 +90,7 @@
 				break;
 			case 'carousel':
 			case 'carousel-with-thumbs':
-				echo "\n<div $gallery_id class=\"gallery carousel\">\n";
+				echo "\n<div $gallery_id class=\"gallery carousel $class\">\n";
 				echo "\t<div class=\"controls\">\n";
 				echo "\t\t<a href=\"#\" class=\"prev\">previous</a>\n";
 				echo "\t\t<a href=\"#\" class=\"next\">next</a>\n";
@@ -97,10 +98,10 @@
 				echo "\t<ul class=\"gallery-images\">\n";
 				break;
 			case 'tiles':
-				echo "\n<div $gallery_id class=\"gallery tiles\">\n";
+				echo "\n<div $gallery_id class=\"gallery tiles $class\">\n";
 				break;
 			default:
-				echo "\n<div $gallery_id class=\"gallery\">\n";
+				echo "\n<div $gallery_id class=\"gallery $class\">\n";
 				break;
 		}
 
@@ -224,51 +225,6 @@
 						break;
 				}
 			}
-			// $caption = $withcaptions ? : '';
-			// $share = $withshare ? '<span class="share">share</span>' : '';
-
-			// switch($layout) {
-			// 	case 'carousel':
-			// 	case 'carousel-with-thumbs':
-			// 		$before_image = '<li data-image="' . $imagecount .'"><div class="slide-content">';
-			// 		$after_image = $caption . $share . '</div></li>';
-			// 		break;
-			// 	case 'tiles':
-			// 		$before_image = '<div data-image="' . $imagecount . '" class="tile ' . $size . '">';
-			// 		$after_image = $caption . $share . '</div>';
-			// 		break;
-			// 	default:
-			// 		$before_image = '';
-			// 		$after_image = $caption . $share . '';
-			// 		break;
-			// }
-
-			// $before_image = $withlinks ? $before_image . '<a href="' . wp_get_attachment_url($image->ID) . '">' : $before_image;
-			// $after_image = $withlinks ? $after_image . '</a>' : $after_image;
-
-			// $caption = $image->post_excerpt;
-
-			// $description = $image->post_content;
-			// if($description == '') $description = $image->post_title;
-
-			// $image_alt = get_post_meta($image->ID,'_wp_attachment_image_alt', true);
-
-			// // render your gallery here
-			// if ($usedivs) {
-			// 	echo "\t\t$before_image",
-			// 		"<div style=\"background-image: url('",
-			// 		wednesday_gallery_getAttachmentURL($image->ID, $size),
-			// 		"');\"></div>",
-			// 		"$after_image\n";
-			// } else {
-			// 	echo "\t\t$before_image",
-			// 			preg_replace(
-			// 				'/(width|height)=\"\d*\"\s/',
-			// 				"",
-			// 				wp_get_attachment_image($image->ID, $size)
-			// 			),
-			// 		"$after_image\n";
-			// }
 
 			echo wednesday_gallery_template($template_slides, $data);
 			$output_thumbs .= wednesday_gallery_template($template_thumbs, $data); // save the thumbnail output for later
@@ -292,37 +248,7 @@
 				echo "\t</ul>\n";
 				echo "\t<a href=\"#\" class=\"gallery-thumbnails-toggle\">$toggletext</a>\n";
 				echo "\t<ul class=\"gallery-thumbnails\">\n";
-
 				echo $output_thumbs;
-
-				// $imagecount = 0;
-				// foreach ( $images as $image ) {
-				// 	$imagecount++;
-
-				// 	$before_image = '<li data-thumbnail="' . $imagecount .'">';
-				// 	$after_image = '</li>';
-
-				// 	$caption = $image->post_excerpt;
-
-				// 	$description = $image->post_content;
-				// 	if($description == '') $description = $image->post_title;
-
-				// 	$image_alt = get_post_meta($image->ID,'_wp_attachment_image_alt', true);
-
-				// 	if ($usedivs) {
-				// 		echo "\t\t$before_image",
-				// 			"<div style=\"background-image: url('",
-				// 			wednesday_gallery_getAttachmentURL($image->ID, $size),
-				// 			"');\"></div>",
-				// 			"$after_image\n";
-				// 	} else {
-				// 		// render your gallery here
-				// 		echo "\t\t$before_image",
-				// 			preg_replace( '/(width|height)=\"\d*\"\s/', "", wp_get_attachment_image($image->ID, 'thumbnail')),
-				// 			// echo "$imagecount<br/>"; // debugging
-				// 			"$after_image\n";
-				// 	}
-				// }
 				echo "\t</ul>\n";
 				break;
 			case 'tiles':
@@ -333,7 +259,6 @@
 		echo "</div>\n";
 
 	}
-
 
 	function wednesday_attachment_field_link($form_fields, $post) {
 
