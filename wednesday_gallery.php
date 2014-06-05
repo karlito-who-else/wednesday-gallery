@@ -198,8 +198,8 @@
 					case 'tiles':
 						$template_slides .= '<div data-image="%IMAGE_COUNT%" class="tile ' . $size . '">';
 						$template_slides .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
-						$template_slides .= $usedivs ? "			<div style=\"background-image: url('%IMAGE_URL%');\"></div>" : '			%IMAGE%';
-						$template_slides .= '		<div class="slide-info">';
+						$template_slides .= $usedivs ? "			<div class=\"tile-content\" style=\"background-image: url('%IMAGE_URL%');\"></div>" : '			%IMAGE%';
+						$template_slides .= '		<div class="tile-info">';
 						$template_slides .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
 						$template_slides .= '			<span class="title">%TITLE%</span>';
 						$template_slides .= '		</div>';
