@@ -160,8 +160,8 @@
 				'DATE_YEAR' => get_the_time('Y', $image->ID)
 			);
 
-			$template_slides = $template; // reset the template
-			$template_thumbs = $thumbtemplate;
+			$template_slides = html_entity_decode($template); // reset the template
+			$template_thumbs = html_entity_decode($thumbtemplate);
 
 			if ($template_slides == '') { // if the template is empty, use the default template for the layout
 				switch($layout) {
