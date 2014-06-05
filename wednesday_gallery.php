@@ -156,6 +156,7 @@
 				'IMAGE_URL' => wednesday_gallery_getAttachmentURL($image->ID, $size),
 				'THUMB' => wp_get_attachment_image($image->ID, 'thumbnail'),
 				'THUMB_URL' => wednesday_gallery_getAttachmentURL($image->ID, 'thumbnail'),
+				'UPLOAD_URL' => wednesday_gallery_getAttachmentURL($image->ID, 'full'),
 				'TITLE' => $image->post_title,
 				'EXCERPT' => $image->post_excerpt,
 				'DESCRIPTION' => $image->post_content,
