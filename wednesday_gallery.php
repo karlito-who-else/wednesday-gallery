@@ -64,6 +64,7 @@
 			'layout' => '',
 			'link' => 'file',
 			'name' => 'gallery',
+			'nodimensions' => false,
 			'size' => 'medium',
 			'sizes' => '',
 			'template' => '',
@@ -146,7 +147,12 @@
 			$data = array(
 				'IMAGE_COUNT' => $imagecount,
 				'IMAGE_ID' => $image->ID,
-				'IMAGE' => wp_get_attachment_image($image->ID, $size),
+				'IMAGE' => $nodimensions ?
+					preg_replace(
+						'/(width|height)=\"\d*\"\s/',
+						"",
+						wp_get_attachment_image($image->ID, $size)
+					) : wp_get_attachment_image($image->ID, $size),
 				'IMAGE_URL' => wednesday_gallery_getAttachmentURL($image->ID, $size),
 				'THUMB' => wp_get_attachment_image($image->ID, 'thumbnail'),
 				'THUMB_URL' => wednesday_gallery_getAttachmentURL($image->ID, 'thumbnail'),
@@ -157,7 +163,8 @@
 				'LINK_URL' => wp_get_attachment_url($image->ID),
 				'DATE_DAY' => get_the_time('j', $image->ID),
 				'DATE_MONTH' => get_the_time('F', $image->ID),
-				'DATE_YEAR' => get_the_time('Y', $image->ID)
+				'DATE_YEAR' => get_the_time('Y', $image->ID),
+				'SIZE' => $size
 			);
 
 			$template_slides = html_entity_decode($template); // reset the template
