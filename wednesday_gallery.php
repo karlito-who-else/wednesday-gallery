@@ -158,7 +158,7 @@
 				'THUMB_URL' => wednesday_gallery_getAttachmentURL($image->ID, 'thumbnail'),
 				'TITLE' => $image->post_title,
 				'EXCERPT' => $image->post_excerpt,
-				'DESCRIPTION' => empty($image->post_content) ? $image->post_title : $image->post_content,
+				'DESCRIPTION' => $image->post_content,
 				'ALT_TEXT' => get_post_meta($image->ID, '_wp_attachment_image_alt', true),
 				'LINK_URL' => wp_get_attachment_url($image->ID),
 				'DATE_DAY' => get_the_time('j', $image->ID),
