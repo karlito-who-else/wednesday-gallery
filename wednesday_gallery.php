@@ -265,6 +265,7 @@
 				echo "</div>\n";
 				break;
 			default:
+				echo "</div>\n";
 				break;
 		}
 
