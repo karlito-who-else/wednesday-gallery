@@ -11,23 +11,27 @@
 	 */
 	var Wednesday = window.Wednesday = window.Wednesday || {};
 	Wednesday.Gallery = {};
+  Wednesday.Gallery.instance = {};
 
-	Wednesday.Gallery.item_width = 0;
-	Wednesday.Gallery.left_value = 0;
-	Wednesday.Gallery.current_slide = 0;
-
-	Wednesday.Gallery.updateThumbnails = function() {
-		var currentThumbnail = $('.carousel .gallery-thumbnails').children("li[data-thumbnail='" + Wednesday.Gallery.current_slide.data("image") + "']");
+	Wednesday.Gallery.updateThumbnails = function(context) {
+    // console.log('curr', Wednesday.Gallery.instance[$(context).attr('id')].current_slide);
+		var currentThumbnail = $('.gallery-thumbnails', context).children('li[data-thumbnail="' + Wednesday.Gallery.instance[$(context).attr('id')].current_slide.attr('data-image') + '"]');
+    // var currentThumbnail = Wednesday.Gallery.instance[$(context).attr('id')].current_slide;
+    // console.log('currentThumbnail', currentThumbnail);
 		// remove currentSlide class from the previous thumbnail
-		$('.carousel .gallery-thumbnails li.currentSlide').removeClass('currentSlide');
+		$('.gallery-thumbnails li.currentSlide', context).removeClass('currentSlide');
 		// add currentSlide class to the new thumbnail
 		currentThumbnail.addClass('currentSlide');
 
-		var container_width = $('.carousel').innerWidth();
-		var container_left = $('.carousel').offset().left;
+		var container_width = $(context).innerWidth();
+		var container_offset = $(context).offset();
+    // console.log('container_offset', container_offset);
+    var container_left = container_offset.left;
 		var container_right = container_left + container_width;
 		var thumbnail_width = currentThumbnail.outerWidth();
-		var thumbnail_left = currentThumbnail.offset().left;
+		var thumbnail_offset = currentThumbnail.offset();
+    // console.log('thumbnail_offset', thumbnail_offset);
+    var thumbnail_left = thumbnail_offset.left;
 		var thumbnail_right = thumbnail_left + thumbnail_width;
 
 		// do the shuffle
@@ -44,51 +48,51 @@
 			shift = shift + thumbnail_width;
 			limiter++;
 		}
-		if (shift != 0) $('.carousel .gallery-thumbnails').animate({left : $('.carousel .gallery-thumbnails').position().left + shift});
+		if (shift != 0) $('.gallery-thumbnails', context).animate({left : $('.gallery-thumbnails', context).position().left + shift});
 	}
 
-	Wednesday.Gallery.carouselUpdateCurrentSlide = function() {
+	Wednesday.Gallery.carouselUpdateCurrentSlide = function(context) {
 
 		// remove the currentSlide class from the old current slide
-		$('.carousel .gallery-images li.currentSlide').removeClass('currentSlide');
+		$('.gallery-images li.currentSlide', context).removeClass('currentSlide');
 		// find the new current slide
-		Wednesday.Gallery.current_slide = $('.gallery-images li:nth-child(2)');
+		Wednesday.Gallery.instance[$(context).attr('id')].current_slide = $('.gallery-images li:nth-child(2)', context);
 		// add the currentSlide class to the second item
-		Wednesday.Gallery.current_slide.addClass('currentSlide');
+		Wednesday.Gallery.instance[$(context).attr('id')].current_slide.addClass('currentSlide', context);
 
 		// update the thumbnails to indicate the new current slide
-		Wednesday.Gallery.updateThumbnails();
+		Wednesday.Gallery.updateThumbnails(context);
 	}
 
-	Wednesday.Gallery.carouselReposition = function() {
+	Wednesday.Gallery.carouselReposition = function(context) {
 		//grab the width of the image
-		Wednesday.Gallery.item_width = $('.carousel .gallery-images li').outerWidth(true);
+		Wednesday.Gallery.instance[$(context).attr('id')].item_width = $('.gallery-images li', context).outerWidth(true);
 		//and calculate left value
-		Wednesday.Gallery.left_value = (Wednesday.Gallery.item_width / 2) * (-1);
+		Wednesday.Gallery.instance[$(context).attr('id')].left_value = (Wednesday.Gallery.instance[$(context).attr('id')].item_width / 2) * (-1);
 		//set the default item to the correct position
-		$('.carousel .gallery-images').css({'left' : Wednesday.Gallery.left_value});
+		$('.gallery-images', context).css({'left' : Wednesday.Gallery.instance[$(context).attr('id')].left_value});
 		// fix the slide text widths
-		$('.carousel .gallery-images li .slide-content').width($('.carousel .gallery-images li .slide-content img').width());
+		$('.gallery-images li .slide-content', context).width($('.gallery-images li .slide-content img', context).width());
 	}
 
-	Wednesday.Gallery.carouselBindButtons = function() {
+	Wednesday.Gallery.carouselBindButtons = function(context) {
 
 		//if user clicked on prev button
-		$('a.prev').click(function(e) {
+		$('a.prev', context).click(function(e) {
 
 			//get the right position
-			var left_indent = parseInt($('.carousel .gallery-images').css('left')) + Wednesday.Gallery.item_width;
+			var left_indent = parseInt($('.gallery-images', context).css('left')) + Wednesday.Gallery.instance[$(context).attr('id')].item_width;
 
 			//slide the item
-			$('.carousel .gallery-images').animate({'left' : left_indent}, 200, function(){
+			$('.gallery-images', context).animate({'left' : left_indent}, 200, function(){
 
 				//move the last item and put it as first item
-				$('.carousel .gallery-images li:first').before($('.carousel .gallery-images li:last'));
+				$('.gallery-images li:first', context).before($('.gallery-images li:last', context));
 
-				Wednesday.Gallery.carouselUpdateCurrentSlide();
+				Wednesday.Gallery.carouselUpdateCurrentSlide(context);
 
 				//set the default item to correct position
-				$('.carousel .gallery-images').css({'left' : Wednesday.Gallery.left_value});
+				$('.gallery-images', context).css({'left' : Wednesday.Gallery.instance[$(context).attr('id')].left_value});
 
 			});
 
@@ -98,21 +102,21 @@
 		});
 
 		//if user clicked on next button
-		$('a.next').click(function(e) {
+		$('a.next', context).click(function(e) {
 
 			//get the right position
-			var left_indent = parseInt($('.carousel .gallery-images').css('left')) - Wednesday.Gallery.item_width;
+			var left_indent = parseInt($('.gallery-images', context).css('left')) - Wednesday.Gallery.instance[$(context).attr('id')].item_width;
 
 			//slide the item
-			$('.carousel .gallery-images').animate({'left' : left_indent}, 200, function () {
+			$('.gallery-images', context).animate({'left' : left_indent}, 200, function () {
 
 				//move the first item and put it as last item
-				$('.carousel .gallery-images li:last').after($('.carousel .gallery-images li:first'));
+				$('.gallery-images li:last', context).after($('.gallery-images li:first', context));
 
-				Wednesday.Gallery.carouselUpdateCurrentSlide();
+				Wednesday.Gallery.carouselUpdateCurrentSlide(context);
 
 				//set the default item to correct position
-				$('.carousel .gallery-images').css({'left' : Wednesday.Gallery.left_value});
+				$('.gallery-images', context).css({'left' : Wednesday.Gallery.instance[$(context).attr('id')].left_value});
 
 			});
 
@@ -123,21 +127,24 @@
 
 	}
 
-	Wednesday.Gallery.carouselSetup = function() {
-		console.log('carouselSetup');
+	Wednesday.Gallery.carouselSetup = function(context) {
+		// console.log('carouselSetup');
 
 		// move the last item before the first item incase the users decides to click previous as the first action
-		$('.carousel .gallery-images li:first').before($('.carousel .gallery-images li:last'));
+		$('.gallery-images li:first', context).before($('.gallery-images li:last', context));
 
 		// reposition the carousel as necessary (for centering, etc.)
-		Wednesday.Gallery.carouselReposition();
+		Wednesday.Gallery.carouselReposition(context);
 
 		// bind the controls
-		Wednesday.Gallery.carouselBindButtons();
+		Wednesday.Gallery.carouselBindButtons(context);
 
 		// set the current slide
-		Wednesday.Gallery.carouselUpdateCurrentSlide();
+		Wednesday.Gallery.carouselUpdateCurrentSlide(context);
 
+    $(window).resize(function() {
+      Wednesday.Gallery.carouselReposition(context);
+    });
 	}
 
 	//a simple function to click next link
@@ -154,12 +161,24 @@
 
 $(document).ready(function() {
 	if ($('.carousel').length) {
-		$('.carousel').imagesLoaded(Wednesday.Gallery.carouselSetup);
-	};
-});
+		$('.carousel').each(function() {
+      var that = this;
+      var id = $(this).attr('id');
 
-$(window).resize(function() {
-	if ($('.carousel').length) {
-		Wednesday.Gallery.carouselReposition();
-	}
+      // console.log(Wednesday.Gallery);
+      Wednesday.Gallery.instance[id] = {};
+      Wednesday.Gallery.instance[id].item_width = 0;
+      Wednesday.Gallery.instance[id].left_value = 0;
+      Wednesday.Gallery.instance[id].current_slide = 0;
+      // Wednesday.Gallery.instance[id].current_slide = $(this).find('.gallery-images li').first();
+      // console.log(Wednesday.Gallery.instance[id].current_slide);
+
+      $(that).imagesLoaded()
+      .done(function(instance) {
+        // console.log('all images successfully loaded');
+        Wednesday.Gallery.carouselSetup(that);
+      });
+
+    });
+	};
 });
