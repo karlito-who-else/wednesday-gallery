@@ -64,6 +64,7 @@
 			'layout' => '',
 			'link' => 'file',
 			'name' => 'gallery',
+			'nodimensions' => false,
 			'size' => 'medium',
 			'sizes' => '',
 			'template' => '',
@@ -146,22 +147,29 @@
 			$data = array(
 				'IMAGE_COUNT' => $imagecount,
 				'IMAGE_ID' => $image->ID,
-				'IMAGE' => wp_get_attachment_image($image->ID, $size),
+				'IMAGE' => $nodimensions ?
+					preg_replace(
+						'/(width|height)=\"\d*\"\s/',
+						"",
+						wp_get_attachment_image($image->ID, $size)
+					) : wp_get_attachment_image($image->ID, $size),
 				'IMAGE_URL' => wednesday_gallery_getAttachmentURL($image->ID, $size),
 				'THUMB' => wp_get_attachment_image($image->ID, 'thumbnail'),
 				'THUMB_URL' => wednesday_gallery_getAttachmentURL($image->ID, 'thumbnail'),
+				'UPLOAD_URL' => wednesday_gallery_getAttachmentURL($image->ID, 'full'),
 				'TITLE' => $image->post_title,
 				'EXCERPT' => $image->post_excerpt,
-				'DESCRIPTION' => empty($image->post_content) ? $image->post_title : $image->post_content,
+				'DESCRIPTION' => $image->post_content,
 				'ALT_TEXT' => get_post_meta($image->ID, '_wp_attachment_image_alt', true),
 				'LINK_URL' => wp_get_attachment_url($image->ID),
 				'DATE_DAY' => get_the_time('j', $image->ID),
 				'DATE_MONTH' => get_the_time('F', $image->ID),
-				'DATE_YEAR' => get_the_time('Y', $image->ID)
+				'DATE_YEAR' => get_the_time('Y', $image->ID),
+				'SIZE' => $size
 			);
 
-			$template_slides = $template; // reset the template
-			$template_thumbs = $thumbtemplate;
+			$template_slides = html_entity_decode($template); // reset the template
+			$template_thumbs = html_entity_decode($thumbtemplate);
 
 			if ($template_slides == '') { // if the template is empty, use the default template for the layout
 				switch($layout) {
@@ -190,8 +198,8 @@
 					case 'tiles':
 						$template_slides .= '<div data-image="%IMAGE_COUNT%" class="tile ' . $size . '">';
 						$template_slides .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
-						$template_slides .= $usedivs ? "			<div style=\"background-image: url('%IMAGE_URL%');\"></div>" : '			%IMAGE%';
-						$template_slides .= '		<div class="slide-info">';
+						$template_slides .= $usedivs ? "			<div class=\"tile-content\" style=\"background-image: url('%IMAGE_URL%');\"></div>" : '			%IMAGE%';
+						$template_slides .= '		<div class="tile-info">';
 						$template_slides .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
 						$template_slides .= '			<span class="title">%TITLE%</span>';
 						$template_slides .= '		</div>';
