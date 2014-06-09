@@ -60,28 +60,45 @@
 			'icontag' => 'dt',
 			'captiontag' => 'dd',
 			'class' => '',
-			'columns' => 3,
+			'breakpoints' => '',
+			'columns' => 1,
 			'layout' => '',
-			'link' => 'file',
+			'link' => 'default',
 			'name' => 'gallery',
-			'nodimensions' => false,
 			'size' => 'medium',
 			'sizes' => '',
+			'showslides' => '',
 			'template' => '',
 			'thumbtemplate' => '',
-			'toggletext' => 'thumbnails',
-			'usedivs' => false,
-			'withlinks' => false,
+			'textprevious' => 'previous',
+			'textnext' => 'next',
+			'texttoggle' => 'thumbnails',
+			'options' => ''
 		), $atts));
-
-		// set the ID and classes
-		$gallery_id = $name != 'gallery' ? "id=\"$name\"" : '';
 
 		// load the template sizes
 		$sizelist = array();
 		if (!empty($sizes)) {
 			$sizelist = explode(',', $sizes);
 		}
+
+		// do we have breakpoints?
+		if (!empty($showslides)) { $showslides = 'data-showslides="'. $showslides . '"'; }
+		if (!empty($breakpoints)) { $breakpoints = 'data-breakpoints="'. $breakpoints . '"'; }
+
+		// set the options
+		$optionlist = array();
+		if (!empty($options)) {
+			$optionlist = explode(',', $options);
+		}
+		$circular = in_array('circular', $optionlist);
+		$nodimensions = in_array('nodimensions', $optionlist);
+		$usedivs = in_array('usedivs', $optionlist);
+		$withlinks = in_array('withlinks', $optionlist);
+
+		// set the ID and classes
+		$gallery_id = $name != 'gallery' ? "id=\"$name\"" : '';
+		$class = $circular ? 'circular' . $class : $class;
 
 		switch($layout) {
 			case 'json':
@@ -91,18 +108,18 @@
 				break;
 			case 'carousel':
 			case 'carousel-with-thumbs':
-				echo "\n<div $gallery_id class=\"gallery carousel $class\">\n";
+				echo "\n<div $gallery_id $breakpoints $showslides class=\"gallery carousel $class\">\n";
 				echo "\t<div class=\"controls\">\n";
-				echo "\t\t<a href=\"#\" class=\"prev\">previous</a>\n";
-				echo "\t\t<a href=\"#\" class=\"next\">next</a>\n";
+				echo "\t\t<a href=\"#\" class=\"prev\">$textprevious</a>\n";
+				echo "\t\t<a href=\"#\" class=\"next\">$textnext</a>\n";
 				echo "\t</div>\n";
 				echo "\t<ul class=\"gallery-images\">\n";
 				break;
 			case 'tiles':
-				echo "\n<div $gallery_id class=\"gallery tiles $class\">\n";
+				echo "\n<div $gallery_id $breakpoints $showslides class=\"gallery tiles $class\">\n";
 				break;
 			default:
-				echo "\n<div $gallery_id class=\"gallery $class\">\n";
+				echo "\n<div $gallery_id $breakpoints $showslides class=\"gallery $class\">\n";
 				break;
 		}
 
@@ -165,7 +182,11 @@
 				'DATE_DAY' => get_the_time('j', $image->ID),
 				'DATE_MONTH' => get_the_time('F', $image->ID),
 				'DATE_YEAR' => get_the_time('Y', $image->ID),
-				'SIZE' => $size
+				'SIZE' => $size,
+				'NEXT' => $textnext,
+				'PREVIOUS' => $textprevious,
+				'TOGGLE' => $texttoggle,
+				'SHOWSLIDES' => $showslides
 			);
 
 			$template_slides = html_entity_decode($template); // reset the template
@@ -255,7 +276,7 @@
 				break;
 			case 'carousel-with-thumbs':
 				echo "\t</ul>\n";
-				echo "\t<a href=\"#\" class=\"gallery-thumbnails-toggle\">$toggletext</a>\n";
+				echo "\t<a href=\"#\" class=\"gallery-thumbnails-toggle\">$texttoggle</a>\n";
 				echo "\t<ul class=\"gallery-thumbnails\">\n";
 				echo $output_thumbs;
 				echo "\t</ul>\n";
