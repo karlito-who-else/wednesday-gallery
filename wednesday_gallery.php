@@ -70,8 +70,8 @@
 			'showslides' => '',
 			'template' => '',
 			'thumbtemplate' => '',
-			'textprevious' => 'previous',
-			'textnext' => 'next',
+			'textprevious' => '&lt;',
+			'textnext' => '&gt;',
 			'texttoggle' => 'thumbnails',
 			'options' => ''
 		), $atts));
@@ -92,19 +92,21 @@
 			$optionlist = explode(',', $options);
 		}
 		$circular = in_array('circular', $optionlist);
+		$fixed = in_array('fixed', $optionlist);
 		$nodimensions = in_array('nodimensions', $optionlist);
 		$usedivs = in_array('usedivs', $optionlist);
 		$withlinks = in_array('withlinks', $optionlist);
 
 		// set the ID and classes
-		$gallery_id = $name != 'gallery' ? "id=\"$name\"" : '';
+		$gallery_id = $name != 'gallery' ? "id=\"$name\"" : "id=\"$name-$id\"";
 		$class = $circular ? 'circular' . $class : $class;
+		$class = $fixed ? 'fixed' . $class : $class;
 
 		switch($layout) {
 			case 'json':
 				echo '<script ' . $gallery_id . ' type="application/json">';
 				echo '{';
-				echo '	"slides" : [';
+				echo '"slides" : [';
 				break;
 			case 'carousel':
 			case 'carousel-with-thumbs':
@@ -174,10 +176,10 @@
 				'THUMB' => wp_get_attachment_image($image->ID, 'thumbnail'),
 				'THUMB_URL' => wednesday_gallery_getAttachmentURL($image->ID, 'thumbnail'),
 				'UPLOAD_URL' => wednesday_gallery_getAttachmentURL($image->ID, 'full'),
-				'TITLE' => $image->post_title,
-				'EXCERPT' => $image->post_excerpt,
-				'DESCRIPTION' => $image->post_content,
-				'ALT_TEXT' => get_post_meta($image->ID, '_wp_attachment_image_alt', true),
+				'TITLE' => $layout == 'json' ? json_encode($image->post_title) : $image->post_title,
+				'EXCERPT' => $layout == 'json' ? json_encode($image->post_excerpt) : $image->post_excerpt,
+				'DESCRIPTION' => $layout == 'json' ? json_encode($image->post_content) : $image->post_content,
+				'ALT_TEXT' => $layout == 'json' ? json_encode(get_post_meta($image->ID, '_wp_attachment_image_alt', true)) : get_post_meta($image->ID, '_wp_attachment_image_alt', true),
 				'LINK_URL' => wp_get_attachment_url($image->ID),
 				'DATE_DAY' => get_the_time('j', $image->ID),
 				'DATE_MONTH' => get_the_time('F', $image->ID),
@@ -199,7 +201,9 @@
 						$template_slides .= '"count": "%IMAGE_COUNT%",';
 						$template_slides .= '"id": "%IMAGE_ID%",';
 						$template_slides .= '"image_url": "%IMAGE_URL%",';
-						$template_slides .= '"title": "%TITLE%"';
+						$template_slides .= '"title": %TITLE%,';
+						$template_slides .= '"excerpt": %EXCERPT%,';
+						$template_slides .= '"description": %DESCRIPTION%';
 						$template_slides .= $imagecount < count($images) ? '},' : '}';
 						break;
 					case 'carousel':
@@ -263,10 +267,10 @@
 		// add closing markup for layout (carousel, tiles, etc.)
 		switch($layout) {
 			case 'json':
-				echo '	],';
-				echo '	"thumbnails": [';
+				echo '],';
+				echo '"thumbnails": [';
 				echo $output_thumbs;
-				echo '	]';
+				echo ']';
 				echo '}';
 				echo '</script>';
 				break;

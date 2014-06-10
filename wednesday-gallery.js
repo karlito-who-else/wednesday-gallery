@@ -54,19 +54,47 @@
 	}
 
 	Wednesday.Gallery.carouselPosition = function(context) {
-		// console.log($(context).attr('id'), ': current slide = ', (Wednesday.Gallery.instance[$(context).attr('id')].current_slide + 1), '>', Wednesday.Gallery.instance[$(context).attr('id')].shown_slides);
-		if ((Wednesday.Gallery.instance[$(context).attr('id')].current_slide + 1) > Wednesday.Gallery.instance[$(context).attr('id')].shown_slides) {
-			var offset = 0 - (((Wednesday.Gallery.instance[$(context).attr('id')].current_slide + 1) - Wednesday.Gallery.instance[$(context).attr('id')].shown_slides) * Wednesday.Gallery.instance[$(context).attr('id')].slide_width);
-			console.log('offset = ', offset);
+
+		var instance = Wednesday.Gallery.instance[$(context).attr('id')]; // to make the following a little more readable
+
+		if (!$(context).hasClass('fixed') && ((instance.current_slide + 1) > instance.shown_slides)) {
+			instance.slides_offset = (instance.current_slide + 1) - instance.shown_slides;
+			var offset = 0 - (instance.slides_offset * instance.slide_width);
+			$('.gallery-images', context).css({ 'margin-left' : offset });
+		} else if ($(context).hasClass('fixed') || ((instance.current_slide + 1) < (instance.slides_offset + 1))) {
+			instance.slides_offset = instance.current_slide;
+			var offset = 0 - (instance.slides_offset * instance.slide_width);
 			$('.gallery-images', context).css({ 'margin-left' : offset });
 		}
+
+		console.log('offset = ', offset);
 	}
 
 	Wednesday.Gallery.carouselCheckButtons = function(context) {
+
+		var instance = Wednesday.Gallery.instance[$(context).attr('id')]; // to make the following a little more readable
+
 		if (!$(context).hasClass('circular')) {
 			// control button display for non-circular carousels
-			if (Wednesday.Gallery.instance[$(context).attr('id')].current_slide <= 0) { $('a.prev', context).hide(); } else { $('a.prev', context).show(); }
-			if ((Wednesday.Gallery.instance[$(context).attr('id')].current_slide + 1) >= $('.gallery-images li', context).length) { $('a.next', context).hide(); } else { $('a.next', context).show(); }
+			if (instance.slides > instance.shown_slides) {
+				if (instance.current_slide <= 0) {
+					$('a.prev', context).hide();
+				} else {
+					$('a.prev', context).show();
+				}
+				if (
+					(!$(context).hasClass('fixed') && ((instance.current_slide + 1) >= instance.slides)) ||
+					($(context).hasClass('fixed') && (instance.current_slide >= instance.slides - instance.shown_slides))
+				) {
+					$('a.next', context).hide();
+				} else {
+					$('a.next', context).show();
+				}
+			} else {
+				// all slides are on screen
+				$('a.prev', context).hide();
+				$('a.next', context).hide();
+			}
 		}
 	}
 
@@ -80,11 +108,13 @@
 
 	Wednesday.Gallery.carouselBindButtons = function(context) {
 
+		var instance = Wednesday.Gallery.instance[$(context).attr('id')]; // to make the following a little more readable
+
 		//if user clicked on prev button
 		$('a.prev', context).click(function(e) {
 
-			Wednesday.Gallery.instance[$(context).attr('id')].current_slide -= 1;
-			if (Wednesday.Gallery.instance[$(context).attr('id')].current_slide < 0) { Wednesday.Gallery.instance[$(context).attr('id')].current_slide = 0; }
+			instance.current_slide -= 1;
+			if (instance.current_slide < 0) { instance.current_slide = 0; }
 
 			Wednesday.Gallery.carouselCurrentSlide(context);
 			Wednesday.Gallery.carouselPosition(context);
@@ -98,8 +128,9 @@
 		//if user clicked on next button
 		$('a.next', context).click(function(e) {
 
-			Wednesday.Gallery.instance[$(context).attr('id')].current_slide += 1;
-			if ((Wednesday.Gallery.instance[$(context).attr('id')].current_slide + 1) > $('.gallery-images li', context).length) { Wednesday.Gallery.instance[$(context).attr('id') ].current_slide = ($('.gallery-images li', context).length - 1); }
+			instance.current_slide += 1;
+			if (!$(context).hasClass('fixed') && ((instance.current_slide + 1) > instance.slides)) { instance.current_slide = (instance.slides - 1); }
+			if ($(context).hasClass('fixed') && (instance.current_slide + 1 + instance.shown_slides > instance.slides)) { instance.current_slide = instance.slides - instance.shown_slides; }
 
 			Wednesday.Gallery.carouselCurrentSlide(context);
 			Wednesday.Gallery.carouselPosition(context);
@@ -112,8 +143,10 @@
 
 	}
 
-
 	Wednesday.Gallery.carouselBuild = function(context) {
+
+		Wednesday.Gallery.instance[$(context).attr('id')].slides = $('.gallery-images li', context).length;
+		console.log('slides = ', Wednesday.Gallery.instance[$(context).attr('id')].slides);
 
 		// establish numbers of slides shown, depending on breakpoints
 		if ($(context).data('breakpoints')) {
@@ -128,6 +161,7 @@
 			Wednesday.Gallery.instance[$(context).attr('id')].shown_slides = $(context).data('showslides');
 			if (isNaN(Wednesday.Gallery.instance[$(context).attr('id')].shown_slides)) { Wednesday.Gallery.instance[$(context).attr('id')].shown_slides = 1; }
 			console.log('no breakpoints, slides shown = ', Wednesday.Gallery.instance[$(context).attr('id')].shown_slides);
+			Wednesday.Gallery.carouselDraw(context);
 		}
 
 		// redraw the carousel on resize
@@ -153,10 +187,12 @@ $(document).ready(function() {
 			var id = $(this).attr('id');
 
 			Wednesday.Gallery.instance[id] = {};
+			Wednesday.Gallery.instance[id].slides= 0;
 			Wednesday.Gallery.instance[id].carousel_width = 0;
 			Wednesday.Gallery.instance[id].slide_width = 0;
 			Wednesday.Gallery.instance[id].current_slide = 0;
 			Wednesday.Gallery.instance[id].shown_slides = 1;
+			Wednesday.Gallery.instance[id].slides_offset = 0;
 
 			$(that).imagesLoaded().done(function(instance) {
 				// console.log('all images successfully loaded');
