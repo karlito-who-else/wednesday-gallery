@@ -180,7 +180,7 @@
 				'EXCERPT' => $layout == 'json' ? json_encode($image->post_excerpt) : $image->post_excerpt,
 				'DESCRIPTION' => $layout == 'json' ? json_encode($image->post_content) : $image->post_content,
 				'ALT_TEXT' => $layout == 'json' ? json_encode(get_post_meta($image->ID, '_wp_attachment_image_alt', true)) : get_post_meta($image->ID, '_wp_attachment_image_alt', true),
-				'LINK_URL' => wp_get_attachment_url($image->ID),
+				'LINK_URL' => get_the_permalink($image->ID),
 				'DATE_DAY' => get_the_time('j', $image->ID),
 				'DATE_MONTH' => get_the_time('F', $image->ID),
 				'DATE_YEAR' => get_the_time('Y', $image->ID),
