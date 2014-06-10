@@ -104,6 +104,10 @@
 		Wednesday.Gallery.carouselCurrentSlide(context);
 		Wednesday.Gallery.carouselPosition(context);
 		Wednesday.Gallery.carouselCheckButtons(context);
+		$('.gallery-images', context).fadeIn("slow", function() {
+		    // Animation complete
+		    console.log('faded in');
+ 		});
 	}
 
 	Wednesday.Gallery.carouselBindButtons = function(context) {
@@ -185,6 +189,7 @@ $(document).ready(function() {
 		$('.carousel').each(function() {
 			var that = this;
 			var id = $(this).attr('id');
+			$('.gallery-images', this).hide();
 
 			Wednesday.Gallery.instance[id] = {};
 			Wednesday.Gallery.instance[id].slides= 0;

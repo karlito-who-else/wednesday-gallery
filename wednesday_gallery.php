@@ -216,6 +216,8 @@
 						$template_slides .= '		<div class="slide-info">';
 						$template_slides .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
 						$template_slides .= '			<span class="title">%TITLE%</span>';
+						$template_slides .= '			<span class="excerpt">%EXCERPT%</span>';
+						$template_slides .= '			<span class="description">%DESCRIPTION%</span>';
 						$template_slides .= '		</div>';
 						$template_slides .= $withlinks ? ' </a>' : '';
 						$template_slides .= '</li>';
