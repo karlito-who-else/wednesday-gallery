@@ -91,6 +91,7 @@
 		if (!empty($options)) {
 			$optionlist = explode(',', $options);
 		}
+		$centered = in_array('centered', $optionlist);
 		$circular = in_array('circular', $optionlist);
 		$fixed = in_array('fixed', $optionlist);
 		$nodimensions = in_array('nodimensions', $optionlist);
@@ -99,8 +100,9 @@
 
 		// set the ID and classes
 		$gallery_id = $name != 'gallery' ? "id=\"$name\"" : "id=\"$name-$id\"";
-		$class = $circular ? 'circular' . $class : $class;
-		$class = $fixed ? 'fixed' . $class : $class;
+		$class = $circular ? 'circular ' . $class : $class;
+		$class = $fixed ? 'fixed ' . $class : $class;
+		$class = $centered ? 'centered '  . $class : $class;
 
 		switch($layout) {
 			case 'json':
