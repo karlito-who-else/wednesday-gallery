@@ -68,6 +68,7 @@
 			'size' => 'medium',
 			'sizes' => '',
 			'showslides' => '',
+			'showthumbs' => '',
 			'template' => '',
 			'thumbtemplate' => '',
 			'textprevious' => '&lt;',
@@ -84,6 +85,7 @@
 
 		// do we have breakpoints?
 		if (!empty($showslides)) { $showslides = 'data-showslides="'. $showslides . '"'; }
+		if (!empty($showthumbs)) { $showthumbs = 'data-showthumbs="'. $showthumbs . '"'; }
 		if (!empty($breakpoints)) { $breakpoints = 'data-breakpoints="'. $breakpoints . '"'; }
 
 		// set the options
@@ -112,7 +114,7 @@
 				break;
 			case 'carousel':
 			case 'carousel-with-thumbs':
-				echo "\n<div $gallery_id $breakpoints $showslides class=\"gallery carousel $class\">\n";
+				echo "\n<div $gallery_id $breakpoints $showslides $showthumbs class=\"gallery carousel $class\">\n";
 				echo "\t<div class=\"controls\">\n";
 				echo "\t\t<a href=\"#\" class=\"prev\">$textprevious</a>\n";
 				echo "\t\t<a href=\"#\" class=\"next\">$textnext</a>\n";
@@ -120,10 +122,10 @@
 				echo "\t<ul class=\"gallery-images\">\n";
 				break;
 			case 'tiles':
-				echo "\n<div $gallery_id $breakpoints $showslides class=\"gallery tiles $class\">\n";
+				echo "\n<div $gallery_id $breakpoints $showslides $showthumbs class=\"gallery tiles $class\">\n";
 				break;
 			default:
-				echo "\n<div $gallery_id $breakpoints $showslides class=\"gallery $class\">\n";
+				echo "\n<div $gallery_id $breakpoints $showslides $showthumbs class=\"gallery $class\">\n";
 				break;
 		}
 
@@ -213,7 +215,7 @@
 						$template_slides .= '<li data-image="%IMAGE_COUNT%">';
 						$template_slides .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
 						$template_slides .= '		<div class="slide-content">';
-						$template_slides .= $usedivs ? "			<div style=\"background-image: url('%IMAGE_URL%');\"></div>" : '			%IMAGE%';
+						$template_slides .= $usedivs ? "			<div class=\"background\" style=\"background-image: url('%IMAGE_URL%');\"></div>" : '			%IMAGE%';
 						$template_slides .= '		</div>';
 						$template_slides .= '		<div class="slide-info">';
 						$template_slides .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
@@ -237,7 +239,7 @@
 						break;
 					default:
 						$template_slides .= $withlinks ? '<a href="%LINK_URL%">' : '';
-						$template_slides .= $usedivs ? "	<div style=\"background-image: url('%IMAGE_URL%');\"></div>" : '	%IMAGE%';
+						$template_slides .= $usedivs ? "	<div class=\"background\" style=\"background-image: url('%IMAGE_URL%');\"></div>" : '	%IMAGE%';
 						$template_slides .= $withlinks ? '</a>' : '';
 						break;
 				}
