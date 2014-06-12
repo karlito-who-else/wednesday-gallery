@@ -27,30 +27,33 @@
 		var position_current = 0; // $('.gallery-images li.current-slide', context).offset().left;
 		var position_updated = $('.gallery-images li[data-image="' + (instance.current_slide + 1) + '"]', context).position().left;
 		var offset = position_current - position_updated;
+		var centering = 0;
 
 		console.log('current slide position   = ', position_current);
 		console.log('updated slide position   = ', position_updated);
-		console.log('difference (to be moved) = ', offset);
+		console.log('difference (to slide) = ', offset);
 
 		if ($(context).hasClass('centered')) {
-			offset = offset + parseInt((instance.carousel_width - instance.slide_width) / 2);
-			console.log('difference (centered) = ', offset);
+			centering = parseInt((instance.carousel_width - instance.slide_width) / 2);
+			console.log('centering amount = ', centering);
 		}
 
+		console.log('difference (to move) = ', offset + centering);
+
 		// move the slide container by the offset
-		$('.gallery-images', context).animate({'left' : offset}, 500, function(){
+		$('.gallery-images', context).animate({'left' : offset + centering}, 500, function(){
 
 			// if the current element is the first slide element
 			if (instance.current_slide + 1 == $('.gallery-images li:first', context).data('image')) {
 
 				console.log('current slide is first slide, move last to first')
 
-				// remove the last item and put it as first item
+				// remove the last item and put it as the first item
 				$('.gallery-images li:first', context).before($('.gallery-images li:last', context));
 
 				// reposition the container ready for the move
-				console.log($('.gallery-images', context).css('left'), ' to ', 0 - instance.slide_width);
-				$('.gallery-images', context).css({'left' : 0 - instance.slide_width});
+				console.log($('.gallery-images', context).css('left'), ' to ', 0 - instance.slide_width + centering);
+				$('.gallery-images', context).css({'left' : 0 - instance.slide_width + centering});
 
 			}
 
@@ -59,12 +62,12 @@
 
 				console.log('current slide is last slide, move first after last')
 
-				// remove the last item and put it as first item
+				// remove the first item and put it as the last item
 				$('.gallery-images li:last', context).after($('.gallery-images li:first', context));
 
 				// reposition the container ready for the move
-				console.log($('.gallery-images', context).css('left'), ' to ', parseInt($('.gallery-images', context).css('left')) + instance.slide_width);
-				$('.gallery-images', context).css({'left' : parseInt($('.gallery-images', context).css('left')) + instance.slide_width});
+				console.log($('.gallery-images', context).css('left'), ' to ', parseInt($('.gallery-images', context).css('left')) + instance.slide_width + centering);
+				$('.gallery-images', context).css({'left' : parseInt($('.gallery-images', context).css('left')) + instance.slide_width + centering});
 
 			}
 
