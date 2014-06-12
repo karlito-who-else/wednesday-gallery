@@ -135,13 +135,15 @@
 
 		// reposition the carousel ----------------------------------
 
-		var position_current = $('.gallery-images li.current-slide', context).offset().left;
-		var position_updated = $('.gallery-images li[data-image="' + (instance.current_slide + 1) + '"]', context).offset().left;
-		var offset = position_current - position_updated;
+		var offset = instance.current_slide * instance.slide_width;
+		offset = 0 - offset; // flip, reverse it
 
-		console.log('current slide position   = ', position_current);
-		console.log('updated slide position   = ', position_updated);
 		console.log('difference (to be moved) = ', offset);
+
+		// move the slide container by the offset
+		$('.gallery-images', context).animate({ 'left' : offset }, 500, function (e) {
+			// slides moved
+		});
 
 		// update the button visibility -----------------------------
 
@@ -178,13 +180,16 @@
 
 		// reposition the carousel ----------------------------------
 
-		var position_current = $('.gallery-images li.current-slide', context).offset().left;
-		var position_updated = $('.gallery-images li[data-image="' + (instance.current_slide + 1) + '"]', context).offset().left;
-		var offset = position_current - position_updated;
+		var offset_slides = (instance.current_slide + 1) - instance.shown_slides > 0 ? (instance.current_slide + 1) - instance.shown_slides : 0;
+		offset_slides = 0 - offset_slides; // flip, reverse it
+		var offset = offset_slides * instance.slide_width;
 
-		console.log('current slide position   = ', position_current);
-		console.log('updated slide position   = ', position_updated);
 		console.log('difference (to be moved) = ', offset);
+
+		// move the slide container by the offset
+		$('.gallery-images', context).animate({ 'left' : offset }, 500, function (e) {
+			// slides moved
+		});
 
 		// update the button visibility -----------------------------
 
@@ -219,13 +224,17 @@
 
 		var instance = Wednesday.Gallery.instance[$(context).attr('id')]; // get the relevant gallery instance
 
-		console.log('/ GALLERY : UPDATE -----------------------------------------');
+		console.group('/ GALLERY : UPDATE -----------------------------------------');
+		console.log('gallery = ', $(context).attr('id'));
 
 		if ($(context).hasClass('circular')) {
+			console.log('movement = circular');
 			Wednesday.Gallery.circularUpdate(context);
 		} else if ($(context).hasClass('fixed')) {
+			console.log('movement = fixed');
 			Wednesday.Gallery.fixedUpdate(context);
 		} else {
+			console.log('movement = default');
 			Wednesday.Gallery.defaultUpdate(context);
 		}
 
@@ -239,7 +248,7 @@
 		// add the currentSlide class to the new current slide
 		$('.gallery-images li[data-image="' + (instance.current_slide + 1) + '"]', context).addClass('current-slide', context);
 
-		console.log('/ ----------------------------------------- GALLERY : UPDATE');
+		console.groupEnd('/ ----------------------------------------- GALLERY : UPDATE');
 
 		// no changes: 0Wednesday.Gallery.instance[$(context).attr('id')] = instance; // write back any changes
 
@@ -250,7 +259,8 @@
 
 		var instance = Wednesday.Gallery.instance[$(context).attr('id')]; // get the relevant gallery instance
 
-		console.log('/ GALLERY : DRAW -------------------------------------------');
+		console.group('/ GALLERY : DRAW -------------------------------------------');
+		console.log('gallery = ', $(context).attr('id'));
 
 		// grab the width of the carousel
 		instance.carousel_width = $(context).innerWidth();
@@ -259,17 +269,23 @@
 		if (instance.breakpoints) {
 			for(var i=0; i<instance.breakpoints.length; i++) {
 				if ($('body').hasClass('breakpoint-' + instance.breakpoints[i])) {
+
 					instance.shown_slides = instance.show_slides[i];
-					instance.shown_thumbs = instance.show_thumbs[i];
 					// the width of the slide is the carousel width divided by the number of slides to show
 					instance.slide_width = instance.carousel_width / instance.shown_slides;
-					instance.thumb_width = instance.carousel_width / instance.shown_thumbs;
+
+					if ($('.gallery-thumbnails', context).length > 0) {
+						instance.shown_thumbs = instance.show_thumbs[i];
+						// the width of the thumbnail is the carousel width divided by the number of thumbnails to show
+						instance.thumb_width = instance.carousel_width / instance.shown_thumbs;
+					}
+
 				}
 			}
 		} else {
 			// the width of the slide is the carousel width divided by the number of slides to show
 			instance.slide_width = instance.carousel_width / instance.shown_slides;
-			instance.thumb_width = instance.carousel_width / instance.shown_thumbs;
+			if ($('.gallery-thumbnails', context).length > 0) {	instance.thumb_width = instance.carousel_width / instance.shown_thumbs; }
 		}
 
 		console.log('shown slides = ', instance.shown_slides);
@@ -300,7 +316,7 @@
 
 		Wednesday.Gallery.instance[$(context).attr('id')] = instance; // write back any changes
 
-		console.log('------------------------------------------- GALLERY : DRAW /');
+		console.groupEnd('------------------------------------------- GALLERY : DRAW /');
 
 		Wednesday.Gallery.genericUpdate(context);
 
@@ -451,7 +467,9 @@
 		var instance = Wednesday.Gallery.instance[$(context).attr('id')]; // get the relevant gallery instance
 		var doDraw = false;
 
-		console.log('/ GALLERY : BUILD ------------------------------------------');
+		console.group('/ GALLERY : BUILD ------------------------------------------');
+		console.log('gallery = ', $(context).attr('id'));
+		console.log('options = ', $(context).attr('class'));
 
 		instance.slides = $('.gallery-images li', context).length;
 		console.log('slides = ', instance.slides);
@@ -461,14 +479,17 @@
 
 			instance.breakpoints = $(context).data('breakpoints').split(',');
 			instance.show_slides = $(context).data('showslides').split(',');
-			instance.show_thumbs = $(context).data('showthumbs').split(',');
+
+			if ($('.gallery-thumbnails', context).length > 0) {
+				instance.show_thumbs = $(context).data('showthumbs').split(',');
+			}
 
 			console.log('breakpoints = ', instance.breakpoints,'shown slides = ', instance.show_slides, ', shown thumbs = ', instance.shown_thumbs);
 
 			for(var i=0; i<instance.breakpoints.length; i++) {
 
 				console.log('binding to breakpoint', instance.breakpoints[i]);
-			 	$(window).on('enterBreakpoint' + instance.breakpoints[i], function () { Wednesday.Gallery.carouselDraw(context); });
+			 	$(window).on('enterBreakpoint' + instance.breakpoints[i], function () { Wednesday.Gallery.genericDraw(context); });
 
 			}
 
@@ -490,9 +511,8 @@
 		instance.thumbs_upper = instance.shown_thumbs;
 
 		// add the currentSlide class to the current slide and thumbnail (should be the first slide at this point)
-		if ($('.gallery-slides', context).length > 0) {
-			$('.gallery-images li[data-image="' + (instance.current_slide + 1) + '"]', context).addClass('current-slide', context);
-		}
+		$('.gallery-images li[data-image="' + (instance.current_slide + 1) + '"]', context).addClass('current-slide', context);
+
 		if ($('.gallery-thumbnails', context).length > 0) {
 			$('.gallery-thumbnails li[data-thumbnail="' + (instance.current_slide + 1) + '"]', context).addClass('current-thumbnail', context);
 		}
@@ -506,7 +526,7 @@
 
 		Wednesday.Gallery.instance[$(context).attr('id')] = instance; // write back any changes
 
-		console.log('------------------------------------------ GALLERY : BUILD /');
+		console.groupEnd('------------------------------------------ GALLERY : BUILD /');
 
 		// calls that requre the updated instance
 		if (doDraw) { Wednesday.Gallery.genericDraw(context); }
