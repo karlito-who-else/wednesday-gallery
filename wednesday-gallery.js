@@ -310,9 +310,19 @@
 		// fix the slide image and text widths
 		$('.gallery-images li', context).width(instance.slide_width);
 
+		// fix the thumbnail widths
 		if ($('.gallery-thumbnails', context).length > 0) {
 			$('.gallery-thumbnails li', context).width(instance.thumb_width);
 		}
+
+		// update the carousel height
+		if ($('.slide-content .background', context).length > 0) {
+			var imgheight = $('.slide-content .background', context).height();
+			console.log('image height', imgheight);
+		}
+
+		console.log('set carousel height to ', $('.slide-content img', context).height());
+		$(context).height($('.slide-content img', context).height());
 
 		Wednesday.Gallery.instance[$(context).attr('id')] = instance; // write back any changes
 
