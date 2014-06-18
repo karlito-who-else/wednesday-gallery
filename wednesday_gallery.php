@@ -99,6 +99,7 @@
 		$nodimensions = in_array('nodimensions', $optionlist);
 		$usedivs = in_array('usedivs', $optionlist);
 		$withlinks = in_array('withlinks', $optionlist);
+		$wrapimages = in_array('withlinks', $optionlist);
 
 		// set the ID and classes
 		$gallery_id = $name != 'gallery' ? "id=\"$name\"" : "id=\"$name-$id\"";
@@ -215,7 +216,12 @@
 						$template_slides .= '<li data-image="%IMAGE_COUNT%">';
 						$template_slides .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
 						$template_slides .= '		<div class="slide-content">';
-						$template_slides .= $usedivs ? "			<div class=\"background\" style=\"background-image: url('%IMAGE_URL%');\"></div>" : '			%IMAGE%';
+						if ($usedivs) {
+							$template_slides .= "			<div class=\"background\" style=\"background-image: url('%IMAGE_URL%');\"></div>";
+
+						} else {
+							$template_slides .= $wrapimages ? "			<div class=\"slide-image\">%IMAGE%</div>" : '			%IMAGE%';
+						}
 						$template_slides .= '		</div>';
 						$template_slides .= '		<div class="slide-info">';
 						$template_slides .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
