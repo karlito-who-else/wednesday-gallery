@@ -99,7 +99,7 @@
 		$nodimensions = in_array('nodimensions', $optionlist);
 		$usedivs = in_array('usedivs', $optionlist);
 		$withlinks = in_array('withlinks', $optionlist);
-		$wrapimages = in_array('withlinks', $optionlist);
+		$wrapimages = in_array('wrapimages', $optionlist);
 
 		// set the ID and classes
 		$gallery_id = $name != 'gallery' ? "id=\"$name\"" : "id=\"$name-$id\"";
