@@ -503,6 +503,8 @@
 
 			}
 
+			doDraw = true; // this may cause a double draw on desktop
+
 		} else {
 
 			instance.shown_slides = $(context).data('showslides');
