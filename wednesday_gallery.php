@@ -213,7 +213,7 @@
 						break;
 					case 'carousel':
 					case 'carousel-with-thumbs':
-						$template_slides .= '<li data-image="%IMAGE_COUNT%">';
+						$template_slides .= '<li data-image="%IMAGE_COUNT%" style="visibility: hidden;">';
 						$template_slides .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
 						$template_slides .= '		<div class="slide-content">';
 						if ($usedivs) {

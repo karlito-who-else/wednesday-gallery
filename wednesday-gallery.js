@@ -24,20 +24,21 @@
 
 			var instance = Wednesday.Gallery.instance[$(context).attr('id')]; // get the relevant gallery instance
 
-			console.log('------------------------------------------------------------');
+			console.log(' UPDATE THUMBNAILS -----------------------------------------');
 
 			var offset = 0;
 			var animate = typeof force_animate !== 'undefined' ? force_animate : false; // don't animate if we don't need to, unless we're told to
 
+			// if the current slide (zero indexed) plus one is greater than the rightmost thumbnail
 			if (instance.current_slide + 1 > instance.thumbs_upper) {
 				console.log('thumb ', instance.current_slide + 1, ' > ', instance.thumbs_upper);
 				offset = (instance.current_slide + 1) - instance.thumbs_upper;
-				console.log
 				instance.thumbs_upper += offset;
 				instance.thumbs_lower += offset;
 				animate = true;
 			}
 
+			// if the current slide (zero indexed) plus one is less than the leftmost thumbnail
 			if (instance.current_slide + 1 < instance.thumbs_lower) {
 				console.log('thumb ', instance.current_slide + 1, ' < ', instance.thumbs_lower);
 				offset = (instance.current_slide + 1 - instance.thumbs_lower);
@@ -46,7 +47,16 @@
 				animate = true;
 			}
 
-			console.log('thumb boundaries: lower = ', instance.thumbs_lower, ', upper = ', instance.thumbs_upper);
+			console.log('offset = ', offset);
+			console.log('thumb boundaries (pre-check): lower = ', instance.thumbs_lower, ', upper = ', instance.thumbs_upper);
+
+			// boundary checks
+			if (instance.thumbs_lower > instance.slides - (instance.shown_slides - 1)) { instance.thumbs_lower = instance.slides - (instance.shown_slides - 1); }
+			if (instance.thumbs_lower < 1) { instance.thumbs_lower = 1; }
+			if (instance.thumbs_upper < instance.shown_thumbs) { instance.thumbs_upper = instance.shown_thumbs; }
+			if (instance.thumbs_upper > instance.slides) { instance.thumbs_upper = instance.slides; }
+
+			console.log('thumb boundaries (post-check): lower = ', instance.thumbs_lower, ', upper = ', instance.thumbs_upper);
 			console.log('moving thumbnails by ', offset, ' x ', instance.thumb_width, ' = ', (0 - offset) * instance.thumb_width, 'px')
 
 			if (animate) {
@@ -59,6 +69,8 @@
 			$('.gallery-thumbnails li.current-thumbnail', context).removeClass('current-thumbnail', context);
 			// add the currentSlide class to the new current slide
 			$('.gallery-thumbnails li[data-thumbnail="' + (instance.current_slide + 1) + '"]', context).addClass('current-thumbnail', context);
+
+			Wednesday.Gallery.instance[$(context).attr('id')] = instance; // write back any changes
 
 		}
 
@@ -92,13 +104,13 @@
 			// if the current element is the first slide element
 			if (instance.current_slide + 1 == $('.gallery-images li:first', context).data('image')) {
 
-				console.log('current slide is first slide, move last to first')
+				// console.log('current slide is first slide, move last to first')
 
 				// remove the last item and put it as the first item
 				$('.gallery-images li:first', context).before($('.gallery-images li:last', context));
 
 				// reposition the container ready for the move
-				console.log($('.gallery-images', context).css('left'), ' to ', 0 - instance.slide_width + centering);
+				// console.log($('.gallery-images', context).css('left'), ' to ', 0 - instance.slide_width + centering);
 				$('.gallery-images', context).css({'left' : 0 - instance.slide_width + centering});
 
 			}
@@ -106,13 +118,13 @@
 			// if the current element is the last slide element
 			if (instance.current_slide + 1 == $('.gallery-images li:last', context).data('image')) {
 
-				console.log('current slide is last slide, move first after last')
+				// console.log('current slide is last slide, move first after last')
 
 				// remove the first item and put it as the last item
 				$('.gallery-images li:last', context).after($('.gallery-images li:first', context));
 
 				// reposition the container ready for the move
-				console.log($('.gallery-images', context).css('left'), ' to ', parseInt($('.gallery-images', context).css('left')) + instance.slide_width);
+				// console.log($('.gallery-images', context).css('left'), ' to ', parseInt($('.gallery-images', context).css('left')) + instance.slide_width);
 				$('.gallery-images', context).css({'left' : parseInt($('.gallery-images', context).css('left')) + instance.slide_width});
 
 			}
@@ -270,14 +282,14 @@
 			for(var i=0; i<instance.breakpoints.length; i++) {
 				if ($('body').hasClass('breakpoint-' + instance.breakpoints[i])) {
 
-					instance.shown_slides = instance.show_slides[i];
+					instance.shown_slides = parseInt(instance.show_slides[i]);
 					// the width of the slide is the carousel width divided by the number of slides to show
-					instance.slide_width = instance.carousel_width / instance.shown_slides;
+					instance.slide_width = Math.floor(instance.carousel_width / instance.shown_slides);
 
 					if ($('.gallery-thumbnails', context).length > 0) {
-						instance.shown_thumbs = instance.show_thumbs[i];
+						instance.shown_thumbs = parseInt(instance.show_thumbs[i]);
 						// the width of the thumbnail is the carousel width divided by the number of thumbnails to show
-						instance.thumb_width = instance.carousel_width / instance.shown_thumbs;
+						instance.thumb_width = Math.floor(instance.carousel_width / instance.shown_thumbs);
 					}
 
 				}
@@ -313,6 +325,9 @@
 		if ($('.gallery-thumbnails', context).length > 0) {
 			$('.gallery-thumbnails li', context).width(instance.thumb_width);
 		}
+
+		// show the slides if they are hidden (during initial load, for example)
+		$('.gallery-images li').css('visibility','visible');
 
 		Wednesday.Gallery.instance[$(context).attr('id')] = instance; // write back any changes
 
@@ -484,7 +499,9 @@
 				instance.show_thumbs = $(context).data('showthumbs').split(',');
 			}
 
-			console.log('breakpoints = ', instance.breakpoints,'shown slides = ', instance.show_slides, ', shown thumbs = ', instance.shown_thumbs);
+			console.log('breakpoints = ', instance.breakpoints);
+			console.log('show slides = ', instance.show_slides);
+			console.log('show thumbs = ', instance.show_thumbs);
 
 			for(var i=0; i<instance.breakpoints.length; i++) {
 
@@ -501,14 +518,12 @@
 			if (isNaN(instance.shown_slides)) { instance.shown_slides = 1; }
 			if (isNaN(instance.shown_thumbs)) { instance.shown_thumbs = 1; }
 
-			console.log('no breakpoints, shown slides = ', instance.shown_slides, ', shown thumbs = ', instance.shown_thumbs);
+			console.log('no breakpoints');
+			console.log('shown slides = ', instance.shown_slides);
+			console.log('shown thumbs = ', instance.shown_thumbs);
 
 			doDraw = true;
 		}
-
-		// set the thumb window
-		instance.thumbs_lower = 1;
-		instance.thumbs_upper = instance.shown_thumbs;
 
 		// add the currentSlide class to the current slide and thumbnail (should be the first slide at this point)
 		$('.gallery-images li[data-image="' + (instance.current_slide + 1) + '"]', context).addClass('current-slide', context);
@@ -554,11 +569,13 @@ $(document).ready(function() {
 			Wednesday.Gallery.instance[id].carousel_width = 0;
 			Wednesday.Gallery.instance[id].slide_width = 0;
 			Wednesday.Gallery.instance[id].current_slide = 0; // zero indexed, to make life fun
-			Wednesday.Gallery.instance[id].shown_slides = 1;
-			Wednesday.Gallery.instance[id].shown_thumbs = 1;
+			Wednesday.Gallery.instance[id].show_slides = {};
+			Wednesday.Gallery.instance[id].show_thumbs = {};
+			Wednesday.Gallery.instance[id].shown_slides = 0;
+			Wednesday.Gallery.instance[id].shown_thumbs = 0;
 			Wednesday.Gallery.instance[id].slides_offset = 0;
-			Wednesday.Gallery.instance[id].thumbs_lower = 0;
-			Wednesday.Gallery.instance[id].thumbs_upper = 0;
+			Wednesday.Gallery.instance[id].thumbs_lower = 1;
+			Wednesday.Gallery.instance[id].thumbs_upper = 1;
 
 			$(that).imagesLoaded().done(function(instance) {
 				// console.log('all images successfully loaded');
