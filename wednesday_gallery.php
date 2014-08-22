@@ -96,6 +96,7 @@
 		$centered = in_array('centered', $optionlist);
 		$circular = in_array('circular', $optionlist);
 		$fixed = in_array('fixed', $optionlist);
+		$loader = in_array('loader', $optionlist);
 		$nodimensions = in_array('nodimensions', $optionlist);
 		$usedivs = in_array('usedivs', $optionlist);
 		$withlinks = in_array('withlinks', $optionlist);
@@ -288,6 +289,7 @@
 				break;
 			case 'carousel':
 				echo "\t</ul>\n";
+				if ($loader) echo "'\t<div class=\"loader\" style=\"position: absolute; top: 0; left: 0; width: 100%; height: 100%; float: left; background: #000 url('" . plugins_url() . '/wednesday-gallery/' . "loading-spin.svg') no-repeat center;\"></div>\n";
 				echo "</div>\n";
 				break;
 			case 'carousel-with-thumbs':
@@ -296,6 +298,7 @@
 				echo "\t<ul class=\"gallery-thumbnails\">\n";
 				echo $output_thumbs;
 				echo "\t</ul>\n";
+				if ($loader) echo "'\t<div class=\"loader\" style=\"position: absolute; top: 0; left: 0; width: 100%; height: 100%; float: left; background: #000 url('" . plugins_url() . '/wednesday-gallery/' . "loading-spin.svg') no-repeat center;\"></div>\n";
 				echo "</div>\n";
 				break;
 			case 'tiles':
