@@ -186,7 +186,8 @@
 				'EXCERPT' => $layout == 'json' ? json_encode($image->post_excerpt) : $image->post_excerpt,
 				'DESCRIPTION' => $layout == 'json' ? json_encode($image->post_content) : $image->post_content,
 				'ALT_TEXT' => $layout == 'json' ? json_encode(get_post_meta($image->ID, '_wp_attachment_image_alt', true)) : get_post_meta($image->ID, '_wp_attachment_image_alt', true),
-				'LINK_URL' => get_the_permalink($image->ID),
+				'POST_URL' => get_the_permalink($image->ID),
+				'LINK_URL' => get_post_meta($image->ID, 'wednesday_link_url', true),
 				'DATE_DAY' => get_the_time('j', $image->ID),
 				'DATE_MONTH' => get_the_time('F', $image->ID),
 				'DATE_YEAR' => get_the_time('Y', $image->ID),
@@ -215,7 +216,7 @@
 					case 'carousel':
 					case 'carousel-with-thumbs':
 						$template_slides .= '<li data-image="%IMAGE_COUNT%" style="visibility: hidden;">';
-						$template_slides .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
+						$template_slides .= $withlinks ? ' <a href="%POST_URL%">' : ''; // apply links if "withlinks" has been specified
 						$template_slides .= '		<div class="slide-content">';
 						if ($usedivs) {
 							$template_slides .= "			<div class=\"background\" style=\"background-image: url('%IMAGE_URL%');\"></div>";
@@ -235,7 +236,7 @@
 						break;
 					case 'tiles':
 						$template_slides .= '<div data-image="%IMAGE_COUNT%" class="tile ' . $size . '">';
-						$template_slides .= $withlinks ? ' <a href="%LINK_URL%">' : ''; // apply links if "withlinks" has been specified
+						$template_slides .= $withlinks ? ' <a href="%POST_URL%">' : ''; // apply links if "withlinks" has been specified
 						$template_slides .= $usedivs ? "			<div class=\"tile-content\" style=\"background-image: url('%IMAGE_URL%');\"></div>" : '			%IMAGE%';
 						$template_slides .= '		<div class="tile-info">';
 						$template_slides .= '			<span class="date">%DATE_DAY% %DATE_MONTH% %DATE_YEAR%</span>';
@@ -245,7 +246,7 @@
 						$template_slides .= '</div>';
 						break;
 					default:
-						$template_slides .= $withlinks ? '<a href="%LINK_URL%">' : '';
+						$template_slides .= $withlinks ? '<a href="%POST_URL%">' : '';
 						$template_slides .= $usedivs ? "	<div class=\"background\" style=\"background-image: url('%IMAGE_URL%');\"></div>" : '	%IMAGE%';
 						$template_slides .= $withlinks ? '</a>' : '';
 						break;
