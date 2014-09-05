@@ -117,11 +117,12 @@
 			case 'carousel':
 			case 'carousel-with-thumbs':
 				echo "\n<div $gallery_id $breakpoints $showslides $showthumbs class=\"gallery carousel $class\">\n";
-				echo "\t<div class=\"controls\">\n";
-				echo "\t\t<a href=\"#\" class=\"prev\">$textprevious</a>\n";
-				echo "\t\t<a href=\"#\" class=\"next\">$textnext</a>\n";
-				echo "\t</div>\n";
-				echo "\t<ul class=\"gallery-images\">\n";
+				echo "\t<div class=\"gallery-slide-holder\">\n";
+				echo "\t\t<div class=\"controls\">\n";
+				echo "\t\t\t<a href=\"#\" class=\"prev\">$textprevious</a>\n";
+				echo "\t\t\t<a href=\"#\" class=\"next\">$textnext</a>\n";
+				echo "\t\t</div>\n";
+				echo "\t\t<ul class=\"gallery-slides\">\n";
 				break;
 			case 'tiles':
 				echo "\n<div $gallery_id $breakpoints $showslides $showthumbs class=\"gallery tiles $class\">\n";
@@ -232,7 +233,7 @@
 						$template_slides .= '			<span class="description">%DESCRIPTION%</span>';
 						$template_slides .= '		</div>';
 						$template_slides .= $withlinks ? ' </a>' : '';
-						$template_slides .= '</li>';
+						$template_slides .= "</li>\n";
 						break;
 					case 'tiles':
 						$template_slides .= '<div data-image="%IMAGE_COUNT%" class="tile ' . $size . '">';
@@ -264,8 +265,8 @@
 						break;
 					case 'carousel-with-thumbs':
 						$template_thumbs .= '<li data-thumbnail="%IMAGE_COUNT%">';
-						$template_thumbs .= $usedivs ? "	<div style=\"background-image: url('%THUMB_URL%');\"></div>" : '	%THUMB%';
-						$template_thumbs .= '</li>';
+						$template_thumbs .= $usedivs ? "<div style=\"background-image: url('%THUMB_URL%');\"></div>" : '%THUMB%';
+						$template_thumbs .= "</li>\n";
 						break;
 					default:
 						$template_thumbs .= '';
@@ -289,16 +290,24 @@
 				echo '</script>';
 				break;
 			case 'carousel':
-				echo "\t</ul>\n";
+				echo "\t\t</ul>\n";
+				echo "\t</div>\n";
 				if ($loader) echo "'\t<div class=\"loader\" style=\"position: absolute; top: 0; left: 0; width: 100%; height: 100%; float: left; background: #000 url('" . plugins_url() . '/wednesday-gallery/' . "loading-spin.svg') no-repeat center;\"></div>\n";
 				echo "</div>\n";
 				break;
 			case 'carousel-with-thumbs':
-				echo "\t</ul>\n";
+				echo "\t\t</ul>\n";
+				echo "\t</div>\n";
 				echo "\t<a href=\"#\" class=\"gallery-thumbnails-toggle\">$texttoggle</a>\n";
-				echo "\t<ul class=\"gallery-thumbnails\">\n";
+				echo "\t<div class=\"gallery-thumbnail-holder\">\n";
+				echo "\t\t<ul class=\"gallery-thumbnails\">\n";
 				echo $output_thumbs;
-				echo "\t</ul>\n";
+				echo "\t\t</ul>\n";
+				echo "\t\t<div class=\"thumbnail-controls\">\n";
+				echo "\t\t\t<a href=\"#\" class=\"thumbnail-prev\">$textprevious</a>\n";
+				echo "\t\t\t<a href=\"#\" class=\"thumbnail-next\">$textnext</a>\n";
+				echo "\t\t</div>\n";
+				echo "\t</div>\n";				
 				if ($loader) echo "'\t<div class=\"loader\" style=\"position: absolute; top: 0; left: 0; width: 100%; height: 100%; float: left; background: #000 url('" . plugins_url() . '/wednesday-gallery/' . "loading-spin.svg') no-repeat center;\"></div>\n";
 				echo "</div>\n";
 				break;
