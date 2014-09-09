@@ -420,7 +420,7 @@
     var instance = Wednesday.Gallery.instance[$(context).attr('id')]; // get the relevant gallery instance
     instance.thumbs_slide = instance.thumbs_lower - 2; // minus 2 because of the zero-indexing
     if (instance.thumbs_slide < 0) {
-      instance.thumbs_slide = instance.slides - 1;
+      instance.thumbs_slide = 0;
     }
 
     Wednesday.Gallery.instance[$(context).attr('id')] = instance; // write back any changes
@@ -433,12 +433,12 @@
     var instance = Wednesday.Gallery.instance[$(context).attr('id')]; // get the relevant gallery instance
     instance.thumbs_slide = instance.thumbs_upper; // no plus because of the zero-indexing
     if (instance.thumbs_slide >= instance.slides) {
-      instance.thumbs_slide = 0;
+      instance.thumbs_slide = instance.slides - 1;
     }
 
     Wednesday.Gallery.instance[$(context).attr('id')] = instance; // write back any changes
 
-    Wednesday.Gallery.genericThumbnails(context);
+    Wednesday.Gallery.genericThumbnails(context, true);
   };  
 
   // Binds the appropriate events for the carousel type
@@ -523,6 +523,21 @@
       e.preventDefault();
 
     });
+
+    // keyboard navigation
+    $(document).keydown(function (e) {
+      switch(e.which) {
+        case 37: // left
+          $('a.prev', context).trigger('click');
+          break;
+        case 39: // up
+          $('a.next', context).trigger('click');
+          break;
+        default:
+        return; // exit this handler for other keys
+      }
+      e.preventDefault(); // prevent the default action (scroll / move caret)
+    });    
 
     // clicked on a thumbnail
     $('.gallery-thumbnails li', context).on('click', function () {
