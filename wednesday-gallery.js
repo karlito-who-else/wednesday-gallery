@@ -501,28 +501,40 @@
     });
 
     // clicked on prev thumbnail button
-    $('a.thumbnail-prev', context).on('click', function (e) {
-
-      if ($(context).hasClass('circular')) {
-        Wednesday.Gallery.circularPreviousThumbnail(context);
+    $('a.thumbnail-prev', context).hover(
+      function (e) {
+        Wednesday.Gallery.instance[$(context).attr('id')].interval = setInterval(function (e) {
+          if ($(context).hasClass('circular') && !$('.gallery-thumbnails').is(':animated')) {
+            Wednesday.Gallery.circularPreviousThumbnail(context);
+          }
+        }, 100)
+      },
+      function (e) {
+        clearInterval(Wednesday.Gallery.instance[$(context).attr('id')].interval);
       }
-
+    );
       //cancel the default behavior
-      e.preventDefault();
+      // e.preventDefault();
 
-    });
+    // });
 
     // clicked on next thumbnail button
-    $('a.thumbnail-next', context).on('click', function (e) {
-
-      if ($(context).hasClass('circular')) {
-        Wednesday.Gallery.circularNextThumbnail(context);
+    $('a.thumbnail-next', context).hover(
+      function (e) {
+        Wednesday.Gallery.instance[$(context).attr('id')].interval = setInterval(function (e) {
+          if ($(context).hasClass('circular') && !$('.gallery-thumbnails').is(':animated')) {
+            Wednesday.Gallery.circularNextThumbnail(context);
+          }
+        }, 100);
+      },
+      function (e) {
+        clearInterval(Wednesday.Gallery.instance[$(context).attr('id')].interval);
       }
-
+    );
       //cancel the default behavior
-      e.preventDefault();
+      // e.preventDefault();
 
-    });
+    // });
 
     // keyboard navigation
     $(document).keydown(function (e) {
