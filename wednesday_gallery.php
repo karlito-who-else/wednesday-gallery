@@ -56,9 +56,9 @@
 			'orderby' => 'menu_order ASC, ID ASC',
 			'include' => '',
 			'id' => $post->ID,
-			'itemtag' => 'dl',
-			'icontag' => 'dt',
-			'captiontag' => 'dd',
+			// 'itemtag' => 'dl',
+			// 'icontag' => 'dt',
+			// 'captiontag' => 'dd',
 			'class' => '',
 			'breakpoints' => '',
 			'columns' => 1,
@@ -307,7 +307,7 @@
 				echo "\t\t\t<a href=\"#\" class=\"thumbnail-prev\">$textprevious</a>\n";
 				echo "\t\t\t<a href=\"#\" class=\"thumbnail-next\">$textnext</a>\n";
 				echo "\t\t</div>\n";
-				echo "\t</div>\n";				
+				echo "\t</div>\n";
 				if ($loader) echo "'\t<div class=\"loader\" style=\"position: absolute; top: 0; left: 0; width: 100%; height: 100%; float: left; background: #000 url('" . plugins_url() . '/wednesday-gallery/' . "loading-spin.svg') no-repeat center;\"></div>\n";
 				echo "</div>\n";
 				break;
