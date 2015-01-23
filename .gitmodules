@@ -1,3 +1,3 @@
 [submodule "js"]
 	path = js
-	url = git@github.com:wednesdaylondon/breakpoints.git
+	url = https://jgwednesday@github.com/wednesdaylondon/breakpoints.git
