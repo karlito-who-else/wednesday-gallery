@@ -19,7 +19,7 @@
 			wp_enqueue_script('EventEmitter');
 			wp_enqueue_script('debounce');
 			wp_enqueue_script('imagesloaded');
-			wp_enqueue_script('breakpoints', plugins_url() . '/wednesday-gallery/breakpoints.js', array(), '1.0', true);
+			wp_enqueue_script('breakpoints', plugins_url() . '/wednesday-gallery/js/breakpoints.js', array(), '1.0', true);
 			wp_enqueue_script('gallery-script', plugins_url() . '/wednesday-gallery/wednesday-gallery.js', array(), '1.0.0', true);
 		}
 	}
