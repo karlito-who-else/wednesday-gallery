@@ -636,11 +636,16 @@
     // bind the controls
     Wednesday.Gallery.genericBindEvents(context);
 
-    $('.loader', context).fadeOut('slow', function () {
-      console.log('carousel images loaded');
+    // remove the loader if it exists
+    if ($('.loader').length > 0) {
+      $('.loader', context).fadeOut('slow', function () {
+        console.log('carousel images loaded, removing loader, initialising breakpoints');
+        $(window).initialiseBreakpoints();
+      });
+    } else {
+      console.log('carousel images loaded, initialising breakpoints');
       $(window).initialiseBreakpoints();
-    });
-
+    };
   };
 
   window.Wednesday.Gallery = Wednesday.Gallery;
