@@ -10,9 +10,16 @@
 
 	function wednesday_gallery_enqueue_scripts() {
 		if (!is_admin()) {
-			wp_deregister_script('jquery');
-			wp_register_script('jquery', "http" . ($_SERVER['SERVER_PORT'] == 443 ? "s" : "") . "://code.jquery.com/jquery-2.1.1.min.js", false, null);
-			wp_enqueue_script('jquery');
+			// wp_deregister_script('jquery');
+			// wp_register_script('jquery', "http" . ($_SERVER['SERVER_PORT'] == 443 ? "s" : "") . "://code.jquery.com/jquery-2.1.1.min.js", false, null);
+			wp_register_script('EventEmitter', "http" . ($_SERVER['SERVER_PORT'] == 443 ? "s" : "") . "://cdnjs.cloudflare.com/ajax/libs/EventEmitter/4.2.11/EventEmitter.js", false, null);
+			wp_register_script('debounce', "http" . ($_SERVER['SERVER_PORT'] == 443 ? "s" : "") . "://cdnjs.cloudflare.com/ajax/libs/jquery-throttle-debounce/1.1/jquery.ba-throttle-debounce.min.js", false, null);
+			wp_register_script('imagesloaded', "http" . ($_SERVER['SERVER_PORT'] == 443 ? "s" : "") . "://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/3.1.8/imagesloaded.js", false, null);
+			// wp_enqueue_script('jquery');
+			wp_enqueue_script('EventEmitter');
+			wp_enqueue_script('debounce');
+			wp_enqueue_script('imagesloaded');
+			wp_enqueue_script('breakpoints', plugins_url() . '/wednesday-gallery/breakpoints.js', array(), '1.0', true);
 			wp_enqueue_script('gallery-script', plugins_url() . '/wednesday-gallery/wednesday-gallery.js', array(), '1.0.0', true);
 		}
 	}

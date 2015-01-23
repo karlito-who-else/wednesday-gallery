@@ -439,7 +439,7 @@
     Wednesday.Gallery.instance[$(context).attr('id')] = instance; // write back any changes
 
     Wednesday.Gallery.genericThumbnails(context, true);
-  };  
+  };
 
   // Binds the appropriate events for the carousel type
   Wednesday.Gallery.genericBindEvents = function (context) {
@@ -549,7 +549,7 @@
         return; // exit this handler for other keys
       }
       e.preventDefault(); // prevent the default action (scroll / move caret)
-    });    
+    });
 
     // clicked on a thumbnail
     $('.gallery-thumbnails li', context).on('click', function () {
